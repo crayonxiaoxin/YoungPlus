@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "226415295744",
+    "firebase_url": "https://crested-guru-110217.firebaseio.com",
+    "project_id": "crested-guru-110217",
+    "storage_bucket": "crested-guru-110217.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:226415295744:android:f1d744ce93e5e3a9",
+        "android_client_info": {
+          "package_name": "com.ormediagroup.youngplus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "226415295744-tk5ov00nsb0pkijdd0l7rb3thot149pb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3pkHXbr8--x0TKDJmyYpnQzxRWgY-0yU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

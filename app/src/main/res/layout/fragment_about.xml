@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="30dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="關於Young+"
+            android:textColor="@color/styleColor"
+            android:textSize="22sp" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/pic_about_460x250" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingTop="5dp"
+            android:text="品牌理念Young+ Mission:"
+            android:textColor="#333"
+            android:textSize="20sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lineSpacingExtra="10dp"
+            android:textColor="#333"
+            android:text="Young+ 透過高科技醫學檢測及專業數據分析為客戶進行全方位個人化健康評估，結合中西方醫學、營養監控、皮膚及體重管理等專業服務, 致誠為顧客提供一站式健康管理服務, 透過精準醫學數據及先進科學數碼化的監察, 時刻為客戶貼心跟進身體狀態, 全面照顧所需, 推動逆齡健康生活, 從內而外散發身心年輕自信魅力, 享受優越理想生活模式。"
+            android:textSize="16sp" />
+    </LinearLayout>
+</ScrollView>
