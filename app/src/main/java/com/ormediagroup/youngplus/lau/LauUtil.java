@@ -17,6 +17,12 @@ public class LauUtil {
         return dm.widthPixels;
     }
 
+    public static int getScreenHeight(Context context) {
+        Resources res = context.getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+        return dm.heightPixels;
+    }
+
     public static int px2dip(Context context, float pxValue) {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (pxValue / scale + 0.5f);

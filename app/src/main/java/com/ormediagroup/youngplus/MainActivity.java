@@ -1,10 +1,10 @@
 package com.ormediagroup.youngplus;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,16 +14,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
@@ -39,6 +35,8 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
@@ -59,7 +57,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.Format;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -89,10 +86,11 @@ public class MainActivity extends AppCompatActivity implements
     private Button bookSubmit;
     private EditText bookName, bookPhone;
     private boolean isMenuLoaded = false;
-    Handler handler = new Handler();
     private String JumpType = "";
     private int DetailID = -1;
     private int StaticID = -1;
+    private ImageView toggle;
+    private ImageView toggle_side;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,8 +98,10 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main2);
         initView();
         initData();
-        initFCM();
-        receiveIntent();
+        if (checkGooglePlayServices()) {
+            initFCM();
+            receiveIntent();
+        }
     }
 
     /**
@@ -137,6 +137,23 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
+    private boolean checkGooglePlayServices() {
+        GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+        int rc = googleApiAvailability.isGooglePlayServicesAvailable(this);
+        if (rc != ConnectionResult.SUCCESS) {
+            if (googleApiAvailability.isUserResolvableError(rc)) {
+                googleApiAvailability.getErrorDialog(this, rc, 0)
+                        .show();
+            } else {
+                Log.i("ORM", "This device is not supported.");
+                finish();
+            }
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     private void initView() {
         drawerLayout = findViewById(R.id.drawerLayout);
         frameLayout = findViewById(R.id.frameLayout);
@@ -154,9 +171,42 @@ public class MainActivity extends AppCompatActivity implements
         sidebar = findViewById(R.id.sidebar);
         sidebar_menu = findViewById(R.id.sidebar_menu);
         toHome = findViewById(R.id.toHome);
+        toggle = findViewById(R.id.top_toggle);
+        toggle_side = findViewById(R.id.side_toggle);
     }
 
     private void initData() {
+        setDrawerToggle();
+        setDrawerFullScreen();
+        setDrawerHandle();
+        showBookPart();
+        showHomeContent();
+        setLogoAction();
+        loadDrawerMenu();
+    }
+
+    private void showHomeContent() {
+        Fragment home = new HomeFragment2();
+        replaceFragment(home, "home", true);
+    }
+
+    private void setLogoAction() {
+        topLogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toHome("home", 0);
+            }
+        });
+        toHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.closeDrawer(GravityCompat.END);
+                JumpType = "home";
+            }
+        });
+    }
+
+    private void setDrawerHandle() {
         drawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
             @Override
             public void onDrawerOpened(View drawerView) {
@@ -169,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements
                 if (slideOffset == 1) {
                     Log.i(TAG, "onDrawerSlide: ");
                     if (!isMenuLoaded) {
-                        loadSidebarMenu();
+                        loadDrawerMenu();
                     }
                 }
             }
@@ -191,15 +241,11 @@ public class MainActivity extends AppCompatActivity implements
                 } else if (JumpType.equals("detail") && DetailID != -1) {
                     FragmentManager fm = getSupportFragmentManager();
                     if (fm.getBackStackEntryCount() >= 2) {
-                        replaceFragment(ServiceDetailFragment.newInstance(
-                                DetailID),
-                                "detail",
-                                true);
+                        replaceFragment(ServiceDetailFragment.newInstance(DetailID),
+                                "detail", true);
                     } else {
-                        addFragment(ServiceDetailFragment.newInstance(
-                                DetailID),
-                                "detail",
-                                true);
+                        addFragment(ServiceDetailFragment.newInstance(DetailID),
+                                "detail", true);
                     }
                     initDrawerHandle();
                 } else if (JumpType.equals("home")) {
@@ -208,8 +254,30 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
         });
+    }
 
+    private void setDrawerToggle() {
+        toggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.openDrawer(GravityCompat.END);
+            }
+        });
+        toggle_side.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawerLayout.closeDrawer(GravityCompat.END);
+            }
+        });
+    }
 
+    private void initDrawerHandle() {
+        JumpType = "";
+        StaticID = -1;
+        DetailID = -1;
+    }
+
+    private void showBookPart() {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LauUtil.getScreenWidth(MainActivity.this) - bookNow.getWidth(),
                 ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -219,8 +287,10 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 if (bookPanel.getVisibility() == View.VISIBLE) {
+                    bookPart.setClickable(false);
                     bookPanel.setVisibility(View.GONE);
                 } else {
+                    bookPart.setClickable(true);
                     bookPanel.setVisibility(View.VISIBLE);
                     Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.in_from_right);
                     bookPart.startAnimation(animation);
@@ -260,35 +330,9 @@ public class MainActivity extends AppCompatActivity implements
                         bookService.getSelectedItem(), Toast.LENGTH_SHORT).show();
             }
         });
-
-        Fragment home = new HomeFragment2();
-        replaceFragment(home, "home", true);
-
-        topLogo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toHome("home", 0);
-            }
-        });
-        toHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.closeDrawer(GravityCompat.END);
-                JumpType = "home";
-            }
-        });
-
-        loadSidebarMenu();
-
     }
 
-    private void initDrawerHandle() {
-        JumpType = "";
-        StaticID = -1;
-        DetailID = -1;
-    }
-
-    private void loadSidebarMenu() {
+    private void loadDrawerMenu() {
         new JSONResponse(MainActivity.this, SERVICE_URL, "", new JSONResponse.onComplete() {
             @Override
             public void onComplete(JSONObject json) {
@@ -412,6 +456,23 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
         return super.dispatchTouchEvent(ev);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setDrawerFullScreen();
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            setDrawerFullScreen();
+        }
+    }
+
+    private void setDrawerFullScreen() {
+        ViewGroup.LayoutParams sidebarParams = sidebar.getLayoutParams();
+        sidebarParams.width = LauUtil.getScreenWidth(MainActivity.this);
+        sidebarParams.height = LauUtil.getScreenHeight(MainActivity.this);
+        sidebar.setLayoutParams(sidebarParams);
     }
 
     private void setSpinner(Spinner spinner, String[] array) {
