@@ -56,12 +56,12 @@ public class BaseFragment extends Fragment {
         }
     }
 
-    @Override
-    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
-        if (enter) {
-            return AnimationUtils.loadAnimation(mActivity, R.anim.in_from_right);
-        } else {
-            return AnimationUtils.loadAnimation(mActivity, R.anim.out_to_left);
-        }
-    }
+//    @Override
+//    public Animation onCreateAnimation(int transit, boolean enter, int nextAnim) {
+//        if (enter) {
+//            return AnimationUtils.loadAnimation(mActivity, R.anim.in_from_right);
+//        } else {
+//            return AnimationUtils.loadAnimation(mActivity, R.anim.out_to_left);
+//        }
+//    }
 }

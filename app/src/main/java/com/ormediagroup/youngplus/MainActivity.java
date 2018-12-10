@@ -1,5 +1,6 @@
 package com.ormediagroup.youngplus;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -11,13 +12,18 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
@@ -53,6 +59,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -82,6 +89,10 @@ public class MainActivity extends AppCompatActivity implements
     private Button bookSubmit;
     private EditText bookName, bookPhone;
     private boolean isMenuLoaded = false;
+    Handler handler = new Handler();
+    private String JumpType = "";
+    private int DetailID = -1;
+    private int StaticID = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,8 +162,15 @@ public class MainActivity extends AppCompatActivity implements
             public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
                 Log.i(TAG, "onDrawerOpened: ");
-                if (!isMenuLoaded) {
-                    loadSidebarMenu();
+            }
+
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                if (slideOffset == 1) {
+                    Log.i(TAG, "onDrawerSlide: ");
+                    if (!isMenuLoaded) {
+                        loadSidebarMenu();
+                    }
                 }
             }
 
@@ -160,65 +178,88 @@ public class MainActivity extends AppCompatActivity implements
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
                 Log.i(TAG, "onDrawerClosed: ");
+                if (JumpType.equals("static") && StaticID != -1) {
+                    switch (StaticID) {
+                        case 1:
+                            replaceFragment(new AboutFragment(), "about", true);
+                            break;
+                        case 2:
+                            replaceFragment(new ContactFragment(), "contact", true);
+                            break;
+                    }
+                    initDrawerHandle();
+                } else if (JumpType.equals("detail") && DetailID != -1) {
+                    FragmentManager fm = getSupportFragmentManager();
+                    if (fm.getBackStackEntryCount() >= 2) {
+                        replaceFragment(ServiceDetailFragment.newInstance(
+                                DetailID),
+                                "detail",
+                                true);
+                    } else {
+                        addFragment(ServiceDetailFragment.newInstance(
+                                DetailID),
+                                "detail",
+                                true);
+                    }
+                    initDrawerHandle();
+                } else if (JumpType.equals("home")) {
+                    toHome("home", 0);
+                    initDrawerHandle();
+                }
             }
         });
-        new Thread(new Runnable() {
+
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LauUtil.getScreenWidth(MainActivity.this) - bookNow.getWidth(),
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        bookPanel.setLayoutParams(lp);
+        bookPanel.setFocusable(true);
+        bookNow.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void run() {
-                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                        LauUtil.getScreenWidth(MainActivity.this) - bookNow.getWidth(),
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
-//                lp.setMargins(-22,0,0,0);
-                bookPanel.setLayoutParams(lp);
-                bookPanel.setFocusable(true);
-                bookNow.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (bookPanel.getVisibility() == View.VISIBLE) {
-                            bookPanel.setVisibility(View.GONE);
-                        } else {
-                            bookPanel.setVisibility(View.VISIBLE);
-                            Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.in_from_right);
-                            bookPart.startAnimation(animation);
-                        }
-                    }
-                });
-                bookPart.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        bookPanel.setVisibility(View.GONE);
-                    }
-                });
-
-                String[] sex = {"男", "女"};
-                setSpinner(bookSex, sex);
-                String[] services = {"靶向肽療程", "逆齡療程", "營養管理計劃", "中醫診斷及配方",
-                        "脊醫診斷及治療", "醫學美容", "DNA基因檢測", "全面體檢"};
-                setSpinner(bookService, services);
-                bookDate.setInputType(InputType.TYPE_NULL);
-                bookDate.setFocusable(false);
-                bookDate.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        addDatePicker(bookDate);
-                    }
-                });
-                String[] times = {"10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00",
-                        "13:30", "14:00", "14:30", "15:00", "15:30", "14:00", "14:30", "15:00",
-                        "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"};
-                setSpinner(bookTime, times);
-                bookSubmit.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Toast.makeText(MainActivity.this, bookName.getText() + " " +
-                                bookPhone.getText() + " " + bookSex.getSelectedItem() + " " +
-                                bookDate.getText() + " " + bookTime.getSelectedItem() + " " +
-                                bookService.getSelectedItem(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+            public void onClick(View v) {
+                if (bookPanel.getVisibility() == View.VISIBLE) {
+                    bookPanel.setVisibility(View.GONE);
+                } else {
+                    bookPanel.setVisibility(View.VISIBLE);
+                    Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.in_from_right);
+                    bookPart.startAnimation(animation);
+                }
             }
-        }).start();
+        });
+        bookPart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bookPanel.setVisibility(View.GONE);
+            }
+        });
 
+        String[] sex = {"男", "女"};
+        setSpinner(bookSex, sex);
+        String[] services = {"靶向肽療程", "逆齡療程", "營養管理計劃", "中醫診斷及配方",
+                "脊醫診斷及治療", "醫學美容", "DNA基因檢測", "全面體檢"};
+        setSpinner(bookService, services);
+        bookDate.setInputType(InputType.TYPE_NULL);
+        bookDate.setFocusable(false);
+        bookDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addDatePicker(bookDate);
+            }
+        });
+        String[] times = {"10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00",
+                "13:30", "14:00", "14:30", "15:00", "15:30", "14:00", "14:30", "15:00",
+                "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"};
+        setSpinner(bookTime, times);
+        bookSubmit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, bookName.getText() + " " +
+                        bookPhone.getText() + " " + bookSex.getSelectedItem() + " " +
+                        bookDate.getText() + " " + bookTime.getSelectedItem() + " " +
+                        bookService.getSelectedItem(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         Fragment home = new HomeFragment2();
         replaceFragment(home, "home", true);
@@ -232,13 +273,19 @@ public class MainActivity extends AppCompatActivity implements
         toHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                toHome("home", 0);
-                drawerLayout.closeDrawer(sidebar);
+                drawerLayout.closeDrawer(GravityCompat.END);
+                JumpType = "home";
             }
         });
 
         loadSidebarMenu();
 
+    }
+
+    private void initDrawerHandle() {
+        JumpType = "";
+        StaticID = -1;
+        DetailID = -1;
     }
 
     private void loadSidebarMenu() {
@@ -284,17 +331,11 @@ public class MainActivity extends AppCompatActivity implements
                     sidebar_menu.setAdapter(new SidebarExpandableListAdapter(MainActivity.this, group, child));
                     sidebar_menu.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
                         @Override
-                        public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                        public boolean onGroupClick(ExpandableListView parent, View v, final int groupPosition, long id) {
                             if (child.get(groupPosition).isEmpty()) {
-                                switch (group.get(groupPosition).getFlag()) {
-                                    case 1:
-                                        replaceFragment(new AboutFragment(), "about", true);
-                                        break;
-                                    case 2:
-                                        replaceFragment(new ContactFragment(), "contact", true);
-                                        break;
-                                }
-                                drawerLayout.closeDrawer(sidebar);
+                                JumpType = "static";
+                                StaticID = group.get(groupPosition).getFlag();
+                                drawerLayout.closeDrawer(GravityCompat.END);
                                 return true;
                             } else {
                                 return false;
@@ -304,21 +345,9 @@ public class MainActivity extends AppCompatActivity implements
                     sidebar_menu.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
                         @Override
                         public boolean onChildClick(ExpandableListView parent, View v, final int groupPosition, final int childPosition, long id) {
-                            Log.i(TAG, "onChildClick: " + id);
-                            FragmentManager fm = getSupportFragmentManager();
-                            Log.i(TAG, "onChildClick: count = " + fm.getBackStackEntryCount());
-                            if (fm.getBackStackEntryCount() >= 2) {
-                                replaceFragment(ServiceDetailFragment.newInstance(
-                                        child.get(groupPosition).get(childPosition).getDetailID()),
-                                        "detail",
-                                        true);
-                            } else {
-                                addFragment(ServiceDetailFragment.newInstance(
-                                        child.get(groupPosition).get(childPosition).getDetailID()),
-                                        "detail",
-                                        true);
-                            }
-                            drawerLayout.closeDrawer(sidebar);
+                            JumpType = "detail";
+                            DetailID = child.get(groupPosition).get(childPosition).getDetailID();
+                            drawerLayout.closeDrawer(GravityCompat.END);
                             return false;
                         }
                     });
@@ -327,14 +356,13 @@ public class MainActivity extends AppCompatActivity implements
         });
     }
 
-
     @Override
     public void onBackPressed() {
         FragmentManager fm = getSupportFragmentManager();
         int backStackCount = fm.getBackStackEntryCount();
         Log.i("ORM", "onBackPressed: " + backStackCount);
-        if (drawerLayout.isDrawerOpen(sidebar)) {
-            drawerLayout.closeDrawer(sidebar);
+        if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
+            drawerLayout.closeDrawer(GravityCompat.END);
         } else if (bookPanel.getVisibility() == View.VISIBLE) {
             bookPanel.setVisibility(View.GONE);
         } else if (backStackCount > 1) {
@@ -429,7 +457,7 @@ public class MainActivity extends AppCompatActivity implements
     private void replaceFragment(Fragment f, String tag, boolean addToBackStack) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-//        ft.setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left);
+        ft.setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left);
         ft.replace(R.id.frameLayout, f, tag);
         if (addToBackStack) {
             ft.addToBackStack(tag);
@@ -441,7 +469,7 @@ public class MainActivity extends AppCompatActivity implements
     private void addFragment(Fragment f, String tag, boolean addToBackStack) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-//        ft.setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left);
+        ft.setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left);
         ft.hide(fm.findFragmentById(R.id.frameLayout));
         ft.add(R.id.frameLayout, f, tag);
         if (addToBackStack) {
@@ -471,4 +499,6 @@ public class MainActivity extends AppCompatActivity implements
             replaceFragment(ServiceDetailFragment.newInstance(title, url), "detail", true);
         }
     }
+
+
 }

@@ -78,8 +78,9 @@ public class ServiceDetailFragment extends BaseFragment {
     }
 
     private void initView() {
-        service_detail = view.findViewById(R.id.service_detail);
         parentLayout = view.findViewById(R.id.parentLayout);
+        service_detail = new WebView(mActivity);
+        parentLayout.addView(service_detail);
     }
 
     private void initData() {
@@ -105,7 +106,7 @@ public class ServiceDetailFragment extends BaseFragment {
                                 flag = -3;
                                 service_detail.loadUrl(link);
                             } else {
-                                service_detail.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+//                                service_detail.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                                 String bannerHtml = json.getString("banner");
                                 String bodyHtml = json.getJSONObject("data").getString("post_content");
                                 service_detail.loadDataWithBaseURL("file:///android_asset/",

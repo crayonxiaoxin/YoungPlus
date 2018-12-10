@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.ormediagroup.youngplus.R;
 import com.ormediagroup.youngplus.adapter.CarouselPagerAdapter;
@@ -42,7 +43,7 @@ public class HomeFragment2 extends BaseFragment {
     private ViewPager viewPager;
     private CarouselPagerAdapter bannerAdapter;
     private LoadingAndRetryManager loadingAndRetryManager;
-    private ConstraintLayout parentLayout;
+    private LinearLayout parentLayout;
     private RecyclerView homeRecyclerView;
     private MultiViewCommonAdapter<ServicesBean2> serviceAdapter;
 
