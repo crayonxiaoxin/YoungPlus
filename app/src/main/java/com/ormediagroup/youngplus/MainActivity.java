@@ -40,6 +40,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.ormediagroup.youngplus.adapter.SidebarExpandableListAdapter;
 import com.ormediagroup.youngplus.bean.MenuBean;
 import com.ormediagroup.youngplus.bean.ServicesBean;
@@ -68,29 +69,22 @@ public class MainActivity extends AppCompatActivity implements
         ServiceWebviewClient.ServiceWebviewListener {
 
     private String TAG = "ORM";
-    private FrameLayout frameLayout;
-    private boolean isExit = false;
-    private ImageView bookNow;
-    private LinearLayout bookPanel, bookPart;
-    private Spinner bookSex, bookService;
-    private EditText bookDate;
-    private Spinner bookTime;
-    private ExpandableListView sidebar_menu;
-    private ArrayList<MenuBean> group;
-    private ArrayList<List<ServicesBean>> child;
     private String SERVICE_URL = "http://youngplus.com.hk/app-get-services";
-    private DrawerLayout drawerLayout;
-    private LinearLayout sidebar;
-    private ImageView toHome;
-    private ImageView topLogo;
-    private Button bookSubmit;
-    private EditText bookName, bookPhone;
     private boolean isMenuLoaded = false;
     private String JumpType = "";
     private int DetailID = -1;
     private int StaticID = -1;
-    private ImageView toggle;
-    private ImageView toggle_side;
+    private boolean isExit = false;
+
+    private ImageView toHome, topLogo, bookNow, toggle, toggle_side;
+    private LinearLayout bookPanel, bookPart, sidebar;
+    private Spinner bookSex, bookService, bookTime;
+    private ExpandableListView sidebar_menu;
+    private ArrayList<MenuBean> group;
+    private ArrayList<List<ServicesBean>> child;
+    private DrawerLayout drawerLayout;
+    private Button bookSubmit;
+    private EditText bookDate, bookName, bookPhone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements
                     replaceFragment(new AboutFragment(), "about", true);
                     break;
                 case "link":
-                    Uri uri = Uri.parse(intent.getStringExtra("link"));
+                    Uri uri = Uri.parse(LauUtil.getLegalURL(intent.getStringExtra("link")));
                     startActivity(new Intent(Intent.ACTION_VIEW, uri));
                     break;
             }
@@ -128,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initFCM() {
+        FirebaseMessaging.getInstance().subscribeToTopic("all");
         FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(MainActivity.this, new OnSuccessListener<InstanceIdResult>() {
             @Override
             public void onSuccess(InstanceIdResult instanceIdResult) {
@@ -156,7 +151,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private void initView() {
         drawerLayout = findViewById(R.id.drawerLayout);
-        frameLayout = findViewById(R.id.frameLayout);
         topLogo = findViewById(R.id.top_logo);
         bookPart = findViewById(R.id.bookPart);
         bookNow = findViewById(R.id.bookNow);

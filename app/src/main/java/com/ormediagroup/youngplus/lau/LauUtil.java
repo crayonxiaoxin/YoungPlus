@@ -41,4 +41,12 @@ public class LauUtil {
         String suffix = "</body></html>";
         return prefix + bodyString + suffix;
     }
+
+    public static String getLegalURL(String url) {
+        if (url.substring(0, 7).equals("http://") || url.substring(0, 8).equals("https://")) {
+            return url;
+        } else {
+            return "http://" + url;
+        }
+    }
 }

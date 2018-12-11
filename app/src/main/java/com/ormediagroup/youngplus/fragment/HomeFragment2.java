@@ -231,7 +231,7 @@ public class HomeFragment2 extends BaseFragment {
         viewPager = new ViewPager(mActivity);
         ViewPager.LayoutParams viewPagerParam = new ViewPager.LayoutParams();
         viewPagerParam.width = ViewPager.LayoutParams.MATCH_PARENT;
-        viewPagerParam.height = 280;
+        viewPagerParam.height = 320;
         viewPager.setLayoutParams(viewPagerParam);
         homeRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity, LinearLayoutManager.VERTICAL, false));
     }

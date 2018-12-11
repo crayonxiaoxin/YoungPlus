@@ -16,6 +16,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.ormediagroup.youngplus.MainActivity;
 import com.ormediagroup.youngplus.R;
+import com.ormediagroup.youngplus.lau.LauUtil;
 
 import java.util.Map;
 
@@ -24,11 +25,12 @@ import java.util.Map;
  */
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
+
     private static final String TAG = "MyFirebaseMsgService";
 
     @Override
     public void onNewToken(String s) {
-//        super.onNewToken(s);
+        super.onNewToken(s);
         Log.i(TAG, "onNewToken: " + s);
     }
 
@@ -86,7 +88,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 intent.putExtra("type", type);
             } else if (type.equals("link")) {
                 // only for foreground, without sending extra
-                Uri uri = Uri.parse(extra.get("link"));
+                Uri uri = Uri.parse(LauUtil.getLegalURL(extra.get("link")));
                 intent = new Intent(Intent.ACTION_VIEW, uri);
             }
         }

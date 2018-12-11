@@ -25,15 +25,17 @@ import org.json.JSONObject;
  */
 
 public class ServiceDetailFragment extends BaseFragment {
-    private View view;
-    private WebView service_detail;
+
     private String REQUEST_URL = "http://youngplus.com.hk/app-get-service-detail";
     private String link = "";
     private int flag = 0;
+
+    private View view;
+    private WebView service_detail;
     private LoadingAndRetryManager loadingAndRetryManager;
     private LinearLayout parentLayout;
 
-    public static final ServiceDetailFragment newInstance(int id) {
+    public static ServiceDetailFragment newInstance(int id) {
         ServiceDetailFragment f = new ServiceDetailFragment();
         Bundle bundle = new Bundle();
         bundle.putInt("id", id);
@@ -41,7 +43,7 @@ public class ServiceDetailFragment extends BaseFragment {
         return f;
     }
 
-    public static final ServiceDetailFragment newInstance(String title, String url) {
+    public static ServiceDetailFragment newInstance(String title, String url) {
         ServiceDetailFragment f = new ServiceDetailFragment();
         Bundle bundle = new Bundle();
         bundle.putString("title", title);
