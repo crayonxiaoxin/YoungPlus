@@ -12,8 +12,8 @@ import android.widget.LinearLayout;
 
 import com.ormediagroup.youngplus.R;
 import com.ormediagroup.youngplus.lau.LauUtil;
-import com.ormediagroup.youngplus.lau.LoadingAndRetryManager;
-import com.ormediagroup.youngplus.lau.OnLoadingAndRetryListener;
+import com.ormediagroup.youngplus.loadAndRetry.LoadingAndRetryManager;
+import com.ormediagroup.youngplus.loadAndRetry.OnLoadingAndRetryListener;
 import com.ormediagroup.youngplus.lau.ServiceWebviewClient;
 import com.ormediagroup.youngplus.network.JSONResponse;
 
@@ -152,6 +152,7 @@ public class ServiceDetailFragment extends BaseFragment {
     @Override
     public void onPause() {
         super.onPause();
+        // 没有page时
         if (flag == -3 && !link.equals("")) {
             getFragmentManager().popBackStack();
         }

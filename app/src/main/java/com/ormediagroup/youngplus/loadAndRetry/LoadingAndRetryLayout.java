@@ -1,4 +1,4 @@
-package com.ormediagroup.youngplus.lau;
+package com.ormediagroup.youngplus.loadAndRetry;
 
 import android.content.Context;
 import android.os.Looper;
@@ -20,12 +20,10 @@ public class LoadingAndRetryLayout extends FrameLayout {
 
     private static final String TAG = LoadingAndRetryLayout.class.getSimpleName();
 
-
     public LoadingAndRetryLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mInflater = LayoutInflater.from(context);
     }
-
 
     public LoadingAndRetryLayout(Context context, AttributeSet attrs) {
         this(context, attrs, -1);

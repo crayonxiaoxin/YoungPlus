@@ -24,8 +24,8 @@ import com.ormediagroup.youngplus.bean.ServicesBean;
 import com.ormediagroup.youngplus.lau.SingleViewCommonAdapter;
 import com.ormediagroup.youngplus.lau.CommonHolder;
 import com.ormediagroup.youngplus.lau.LauUtil;
-import com.ormediagroup.youngplus.lau.LoadingAndRetryManager;
-import com.ormediagroup.youngplus.lau.OnLoadingAndRetryListener;
+import com.ormediagroup.youngplus.loadAndRetry.LoadingAndRetryManager;
+import com.ormediagroup.youngplus.loadAndRetry.OnLoadingAndRetryListener;
 import com.ormediagroup.youngplus.network.JSONResponse;
 import com.squareup.picasso.Picasso;
 

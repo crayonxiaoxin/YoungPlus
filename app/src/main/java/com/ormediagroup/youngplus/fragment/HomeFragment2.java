@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,9 +20,9 @@ import com.ormediagroup.youngplus.adapter.CarouselPagerAdapter;
 import com.ormediagroup.youngplus.bean.BannerBean;
 import com.ormediagroup.youngplus.bean.ServicesBean2;
 import com.ormediagroup.youngplus.lau.CommonHolder;
-import com.ormediagroup.youngplus.lau.LoadingAndRetryManager;
+import com.ormediagroup.youngplus.loadAndRetry.LoadingAndRetryManager;
 import com.ormediagroup.youngplus.lau.MultiViewCommonAdapter;
-import com.ormediagroup.youngplus.lau.OnLoadingAndRetryListener;
+import com.ormediagroup.youngplus.loadAndRetry.OnLoadingAndRetryListener;
 import com.ormediagroup.youngplus.network.JSONResponse;
 
 import org.json.JSONArray;
@@ -48,7 +47,6 @@ public class HomeFragment2 extends BaseFragment {
     private MultiViewCommonAdapter<ServicesBean2> serviceAdapter;
 
     private final static int HOME_AD_LOOP = 1;
-    
     private String SERVICE_URL = "http://youngplus.com.hk/app-get-services";
 
     static class myHandler extends Handler {
@@ -151,21 +149,23 @@ public class HomeFragment2 extends BaseFragment {
                         JSONArray aceServices = json.getJSONObject("data").getJSONArray("aceServices");
                         JSONArray healthManagement = json.getJSONObject("data").getJSONArray("healthManagement");
                         for (int i = 0; i < aceServices.length(); i++) {
+                            JSONObject obj = aceServices.getJSONObject(i);
                             aceServiceList.add(new ServicesBean2(
                                     2,
-                                    aceServices.getJSONObject(i).getInt("id"),
-                                    aceServices.getJSONObject(i).getString("title"),
-                                    aceServices.getJSONObject(i).getString("img"),
-                                    aceServices.getJSONObject(i).getInt("detail")
+                                    obj.getInt("id"),
+                                    obj.getString("title"),
+                                    obj.getString("img"),
+                                    obj.getInt("detail")
                             ));
                         }
                         for (int i = 0; i < healthManagement.length(); i++) {
+                            JSONObject obj = healthManagement.getJSONObject(i);
                             healthManagementList.add(new ServicesBean2(
                                     2,
-                                    healthManagement.getJSONObject(i).getInt("id"),
-                                    healthManagement.getJSONObject(i).getString("title"),
-                                    healthManagement.getJSONObject(i).getString("img"),
-                                    healthManagement.getJSONObject(i).getInt("detail")
+                                    obj.getInt("id"),
+                                    obj.getString("title"),
+                                    obj.getString("img"),
+                                    obj.getInt("detail")
                             ));
                         }
                     } catch (JSONException e) {
@@ -173,7 +173,6 @@ public class HomeFragment2 extends BaseFragment {
                     }
                     aceServiceList.addAll(healthManagementList);
                     serviceAdapter = new MultiViewCommonAdapter<ServicesBean2>(mActivity, aceServiceList) {
-
                         @Override
                         public int setItemViewType(ServicesBean2 bean) {
                             return bean.getType();
@@ -183,16 +182,16 @@ public class HomeFragment2 extends BaseFragment {
                         public CommonHolder defineViewHolder(ViewGroup parent, int viewType) {
                             switch (viewType) {
                                 case 1:
-                                    return new CommonHolder(inflate(parent, R.layout.item_services_header), false);
+                                    return createHolder(parent, R.layout.item_services_header);
                                 case 2:
-                                    return new CommonHolder(inflate(parent, R.layout.item_services), false);
+                                    return createHolder(parent, R.layout.item_services);
                                 default:
                                     return null;
                             }
                         }
 
                         @Override
-                        public void convert(Context context, CommonHolder holder, int position, final ServicesBean2 bean, int viewType) {
+                        public void convert(final Context context, CommonHolder holder, int position, final ServicesBean2 bean, int viewType) {
                             switch (viewType) {
                                 case 1:
                                     holder.setText(R.id.big_title, bean.getTitle());
@@ -203,7 +202,7 @@ public class HomeFragment2 extends BaseFragment {
                                             .setOnItemClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
-                                                    onHomeFragmentListener ohfl = (onHomeFragmentListener) mActivity;
+                                                    onHomeFragmentListener ohfl = (onHomeFragmentListener) context;
                                                     if (ohfl != null) {
                                                         ohfl.toDetail(bean.getDetailID());
                                                     }

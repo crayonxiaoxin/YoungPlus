@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.ormediagroup.youngplus.R;
+
 import java.util.List;
 
 /**
@@ -44,8 +46,6 @@ public abstract class MultiViewCommonAdapter<T> extends RecyclerView.Adapter<Rec
         if (getItemViewType(position) != TYPE_HEADER && getItemViewType(position) != TYPE_FOOTER) {
             int realPosition = hasHeader() ? position - 1 : position;
             convert(context, (CommonHolder) holder, realPosition, list.get(realPosition), getItemViewType(position));
-        } else {
-            return;
         }
     }
 
@@ -74,8 +74,8 @@ public abstract class MultiViewCommonAdapter<T> extends RecyclerView.Adapter<Rec
         }
     }
 
-    protected View inflate(ViewGroup parent, int layoutID) {
-        return LayoutInflater.from(context).inflate(layoutID, parent, false);
+    protected CommonHolder createHolder(ViewGroup parent, int layoutID) {
+        return new CommonHolder(LayoutInflater.from(context).inflate(layoutID, parent, false), false);
     }
 
     public void setHeaderView(View headerView) {
