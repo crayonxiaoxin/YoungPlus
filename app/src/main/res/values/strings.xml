@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">YoungPlus</string>
+    <string name="app_name">Young+</string>
     <string name="connection_error">未能連接網絡。請檢查你的網絡。</string>
     <string name="title_activity_main3">Main3Activity</string>
 

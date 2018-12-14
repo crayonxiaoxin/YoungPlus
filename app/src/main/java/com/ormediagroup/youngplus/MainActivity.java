@@ -130,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements
                 Log.i(TAG, "onSuccess: token = " + newToken);
             }
         });
+
     }
 
     private boolean checkGooglePlayServices() {
@@ -275,8 +276,9 @@ public class MainActivity extends AppCompatActivity implements
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LauUtil.getScreenWidth(MainActivity.this) - bookNow.getWidth(),
                 ViewGroup.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(-10,0,0,0);
         bookPanel.setLayoutParams(lp);
-        bookPanel.setFocusable(true);
+        bookNow.bringToFront();
         bookNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -294,9 +296,11 @@ public class MainActivity extends AppCompatActivity implements
         bookPart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                bookPart.setClickable(false); // important
                 bookPanel.setVisibility(View.GONE);
             }
         });
+
 
         String[] sex = {"男", "女"};
         setSpinner(bookSex, sex);
@@ -402,6 +406,7 @@ public class MainActivity extends AppCompatActivity implements
         if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
             drawerLayout.closeDrawer(GravityCompat.END);
         } else if (bookPanel.getVisibility() == View.VISIBLE) {
+            bookPart.setClickable(false);
             bookPanel.setVisibility(View.GONE);
         } else if (backStackCount > 1) {
             Fragment f = fm.findFragmentById(R.id.frameLayout);

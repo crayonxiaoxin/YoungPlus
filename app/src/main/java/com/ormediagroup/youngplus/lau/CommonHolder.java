@@ -59,7 +59,7 @@ public class CommonHolder extends RecyclerView.ViewHolder {
 
     public CommonHolder setImageURL(int resID, String url) {
         ImageView imageView = getView(resID);
-        Picasso.get().load(url).resize(200, 200).into(imageView);
+        Picasso.get().load(url).resize(300, 300).into(imageView);
         return this;
     }
 

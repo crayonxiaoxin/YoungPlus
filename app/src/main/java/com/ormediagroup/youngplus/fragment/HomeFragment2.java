@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.ormediagroup.youngplus.R;
@@ -20,10 +21,12 @@ import com.ormediagroup.youngplus.adapter.CarouselPagerAdapter;
 import com.ormediagroup.youngplus.bean.BannerBean;
 import com.ormediagroup.youngplus.bean.ServicesBean2;
 import com.ormediagroup.youngplus.lau.CommonHolder;
+import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.loadAndRetry.LoadingAndRetryManager;
 import com.ormediagroup.youngplus.lau.MultiViewCommonAdapter;
 import com.ormediagroup.youngplus.loadAndRetry.OnLoadingAndRetryListener;
 import com.ormediagroup.youngplus.network.JSONResponse;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -197,6 +200,8 @@ public class HomeFragment2 extends BaseFragment {
                                     holder.setText(R.id.big_title, bean.getTitle());
                                     break;
                                 case 2:
+
+//                                    holder.getView(R.id.service_img).setLayoutParams(new LinearLayout.LayoutParams(LauUtil.getScreenWidth(mActivity)-150, LauUtil.getScreenWidth(mActivity)-150));
                                     holder.setText(R.id.service_title, bean.getTitle())
                                             .setImageURL(R.id.service_img, bean.getImg())
                                             .setOnItemClickListener(new View.OnClickListener() {
