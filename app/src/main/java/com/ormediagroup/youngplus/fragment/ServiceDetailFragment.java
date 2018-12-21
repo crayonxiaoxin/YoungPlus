@@ -103,19 +103,16 @@ public class ServiceDetailFragment extends BaseFragment {
         parentLayout = view.findViewById(R.id.parentLayout);
         service_detail = new WebView(mActivity);
         parentLayout.addView(service_detail);
-//        shareBtn = new ImageView(mActivity);
         shareBtn = new FloatingActionButton(mActivity);
-        RelativeLayout.LayoutParams shareBtnParams = new RelativeLayout.LayoutParams(LauUtil.dip2px(mActivity, 60), LauUtil.dip2px(mActivity, 60));
+        RelativeLayout.LayoutParams shareBtnParams =
+                new RelativeLayout.LayoutParams(LauUtil.dip2px(mActivity, 60), LauUtil.dip2px(mActivity, 60));
         shareBtnParams.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         shareBtnParams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         shareBtnParams.setMargins(20, 20, 20, 40);
         shareBtn.setLayoutParams(shareBtnParams);
         shareBtn.setImageResource(R.drawable.icon_share_white);
-//        shareBtn.setImageBitmap(texta);
         shareBtn.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#754c24")));
         shareBtn.setScaleType(ImageView.ScaleType.CENTER);
-//        shareBtn.setAdjustViewBounds(true);
-//        shareBtn.setBackgroundResource(R.drawable.shape_test);
         parentLayout.addView(shareBtn);
         shareBtn.bringToFront();
     }

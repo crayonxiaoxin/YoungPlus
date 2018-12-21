@@ -34,9 +34,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Log.i(TAG, "onNewToken: " + s);
     }
 
-
-
-
     public void onMessageReceived(RemoteMessage remoteMessage) {
         // [START_EXCLUDE]
         // There are two types of messages data messages and notification messages. Data messages are handled
@@ -102,7 +99,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
-                        .setSmallIcon(R.mipmap.ic_launcher)
+                        .setSmallIcon(R.mipmap.ic_youngplus)
                         .setContentTitle(title)
                         .setContentText(messageBody)
                         .setAutoCancel(true)

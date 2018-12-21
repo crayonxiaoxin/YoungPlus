@@ -2,6 +2,7 @@ package com.ormediagroup.youngplus.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -200,10 +201,7 @@ public class HomeFragment2 extends BaseFragment {
                                     holder.setText(R.id.big_title, bean.getTitle());
                                     break;
                                 case 2:
-
-//                                    holder.getView(R.id.service_img).setLayoutParams(new LinearLayout.LayoutParams(LauUtil.getScreenWidth(mActivity)-150, LauUtil.getScreenWidth(mActivity)-150));
                                     holder.setText(R.id.service_title, bean.getTitle())
-                                            .setImageURL(R.id.service_img, bean.getImg())
                                             .setOnItemClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View v) {
@@ -213,6 +211,10 @@ public class HomeFragment2 extends BaseFragment {
                                                     }
                                                 }
                                             });
+                                    Picasso.get().load(bean.getImg())
+                                            .resize(LauUtil.dip2px(mActivity, 300), LauUtil.dip2px(mActivity, 300))
+                                            .config(Bitmap.Config.RGB_565)
+                                            .into((ImageView) holder.getView(R.id.service_img));
                                     break;
                                 default:
                                     break;

@@ -1,8 +1,24 @@
 package com.ormediagroup.youngplus.lau;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Build;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import com.ormediagroup.youngplus.MainActivity;
+import com.ormediagroup.youngplus.R;
+
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -49,4 +65,26 @@ public class LauUtil {
             return "http://" + url;
         }
     }
+
+    public static Spanned HTMLTagDecode(String str) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(str, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(str);
+        }
+    }
+
+    public static boolean isNull(EditText editText) {
+        return editText.getText().toString().trim().isEmpty();
+    }
+
+    public static boolean isEmail(String email) {
+        String regex = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*";
+        return Pattern.matches(regex, email);
+    }
+
+    public static boolean isPhone(String phone) {
+        return !(phone.contains(" ") || phone.length() < 8 || phone.length() > 11);
+    }
+
 }

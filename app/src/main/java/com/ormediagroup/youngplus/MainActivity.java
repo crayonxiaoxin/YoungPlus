@@ -49,7 +49,11 @@ import com.ormediagroup.youngplus.fragment.BaseFragment;
 import com.ormediagroup.youngplus.fragment.ContactFragment;
 import com.ormediagroup.youngplus.fragment.HomeFragment;
 import com.ormediagroup.youngplus.fragment.HomeFragment2;
+import com.ormediagroup.youngplus.fragment.LoginFragment;
+import com.ormediagroup.youngplus.fragment.PromotionFragment;
+import com.ormediagroup.youngplus.fragment.RegisterFragment;
 import com.ormediagroup.youngplus.fragment.ServiceDetailFragment;
+import com.ormediagroup.youngplus.lau.AlarmService;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.lau.ServiceWebviewClient;
 import com.ormediagroup.youngplus.network.JSONResponse;
@@ -85,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements
     private DrawerLayout drawerLayout;
     private Button bookSubmit;
     private EditText bookDate, bookName, bookPhone;
+    private LinearLayout bookNowPart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,6 +173,7 @@ public class MainActivity extends AppCompatActivity implements
         toHome = findViewById(R.id.toHome);
         toggle = findViewById(R.id.top_toggle);
         toggle_side = findViewById(R.id.side_toggle);
+        bookNowPart = findViewById(R.id.bookNowPart);
     }
 
     private void initData() {
@@ -178,10 +184,18 @@ public class MainActivity extends AppCompatActivity implements
         showHomeContent();
         setLogoAction();
         loadDrawerMenu();
+        initAlarmService();
+    }
+
+    private void initAlarmService() {
+        startService(new Intent(MainActivity.this, AlarmService.class));
     }
 
     private void showHomeContent() {
         Fragment home = new HomeFragment2();
+//        Fragment home = new PromotionFragment();
+//        Fragment home = new RegisterFragment();
+//        Fragment home = new LoginFragment();
         replaceFragment(home, "home", true);
     }
 
@@ -231,6 +245,16 @@ public class MainActivity extends AppCompatActivity implements
                         case 2:
                             replaceFragment(new ContactFragment(), "contact", true);
                             break;
+                        // test
+                        case 3:
+                            replaceFragment(new PromotionFragment(), "promotion", true);
+                            break;
+                        case 4:
+                            replaceFragment(new RegisterFragment(), "register", true);
+                            break;
+                        case 5:
+                            replaceFragment(new LoginFragment(), "login", true);
+                            break;
                     }
                     initDrawerHandle();
                 } else if (JumpType.equals("detail") && DetailID != -1) {
@@ -272,19 +296,24 @@ public class MainActivity extends AppCompatActivity implements
         DetailID = -1;
     }
 
+    private void hideBookPanel() {
+        bookPart.setClickable(false);
+        bookPanel.setVisibility(View.GONE);
+    }
+
     private void showBookPart() {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LauUtil.getScreenWidth(MainActivity.this) - bookNow.getWidth(),
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(-10,0,0,0);
+        lp.setMargins(-10, 0, 0, 0);
         bookPanel.setLayoutParams(lp);
         bookNow.bringToFront();
+        bookPanel.setFocusable(false);
         bookNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (bookPanel.getVisibility() == View.VISIBLE) {
-                    bookPart.setClickable(false);
-                    bookPanel.setVisibility(View.GONE);
+                    hideBookPanel();
                 } else {
                     bookPart.setClickable(true);
                     bookPanel.setVisibility(View.VISIBLE);
@@ -296,8 +325,7 @@ public class MainActivity extends AppCompatActivity implements
         bookPart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                bookPart.setClickable(false); // important
-                bookPanel.setVisibility(View.GONE);
+                hideBookPanel();
             }
         });
 
@@ -342,19 +370,21 @@ public class MainActivity extends AppCompatActivity implements
                         JSONArray aceServices = json.getJSONObject("data").getJSONArray("aceServices");
                         JSONArray healthManagement = json.getJSONObject("data").getJSONArray("healthManagement");
                         for (int i = 0; i < aceServices.length(); i++) {
+                            JSONObject obj = aceServices.getJSONObject(i);
                             aceServiceList.add(new ServicesBean(
-                                    aceServices.getJSONObject(i).getInt("id"),
-                                    aceServices.getJSONObject(i).getString("title"),
-                                    aceServices.getJSONObject(i).getString("img"),
-                                    aceServices.getJSONObject(i).getInt("detail")
+                                    obj.getInt("id"),
+                                    obj.getString("title"),
+                                    obj.getString("img"),
+                                    obj.getInt("detail")
                             ));
                         }
                         for (int i = 0; i < healthManagement.length(); i++) {
+                            JSONObject obj = healthManagement.getJSONObject(i);
                             healthManagementList.add(new ServicesBean(
-                                    healthManagement.getJSONObject(i).getInt("id"),
-                                    healthManagement.getJSONObject(i).getString("title"),
-                                    healthManagement.getJSONObject(i).getString("img"),
-                                    healthManagement.getJSONObject(i).getInt("detail")
+                                    obj.getInt("id"),
+                                    obj.getString("title"),
+                                    obj.getString("img"),
+                                    obj.getInt("detail")
                             ));
                         }
                     } catch (JSONException e) {
@@ -366,10 +396,22 @@ public class MainActivity extends AppCompatActivity implements
                     group.add(new MenuBean("全方位健康管理", 0));
                     group.add(new MenuBean("關於Young+", 1));
                     group.add(new MenuBean("聯絡Young+", 2));
+
+                    // test
+                    group.add(new MenuBean("test-promotion", 3));
+                    group.add(new MenuBean("test-register", 4));
+                    group.add(new MenuBean("test-login", 5));
+
                     child.add(aceServiceList);
                     child.add(healthManagementList);
                     child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
+
+                    // test
+                    child.add(new ArrayList<ServicesBean>());
+                    child.add(new ArrayList<ServicesBean>());
+                    child.add(new ArrayList<ServicesBean>());
+
                     sidebar_menu.setAdapter(new SidebarExpandableListAdapter(MainActivity.this, group, child));
                     sidebar_menu.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
                         @Override
@@ -406,8 +448,7 @@ public class MainActivity extends AppCompatActivity implements
         if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
             drawerLayout.closeDrawer(GravityCompat.END);
         } else if (bookPanel.getVisibility() == View.VISIBLE) {
-            bookPart.setClickable(false);
-            bookPanel.setVisibility(View.GONE);
+            hideBookPanel();
         } else if (backStackCount > 1) {
             Fragment f = fm.findFragmentById(R.id.frameLayout);
             if (f instanceof BaseFragment) {
@@ -481,11 +522,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private String formatDateAndTime(int number) {
         return number < 10 ? "0" + number : "" + number;
-    }
-
-    private void hideKeyBoard() {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(getWindow().getDecorView().getWindowToken(), 0);
     }
 
     private void addDatePicker(final EditText editText) {

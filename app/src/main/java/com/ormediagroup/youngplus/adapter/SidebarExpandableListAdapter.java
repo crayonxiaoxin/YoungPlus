@@ -37,7 +37,7 @@ public class SidebarExpandableListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return child.size();
+        return child.get(groupPosition).size();
     }
 
     @Override

@@ -116,7 +116,8 @@
                     android:layout_gravity="center_vertical"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:singleLine="true" />
             </LinearLayout>
 
             <LinearLayout
@@ -135,7 +136,8 @@
                     android:layout_height="wrap_content"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:singleLine="true" />
             </LinearLayout>
 
             <LinearLayout
@@ -272,7 +274,8 @@
                     android:layout_gravity="center_vertical"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:singleLine="true" />
             </LinearLayout>
 
             <LinearLayout
@@ -293,7 +296,8 @@
                     android:layout_gravity="center_vertical"
                     android:focusable="true"
                     android:focusableInTouchMode="true"
-                    android:maxLines="1" />
+                    android:maxLines="1"
+                    android:singleLine="true" />
             </LinearLayout>
 
             <LinearLayout
