@@ -28,7 +28,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -48,7 +47,6 @@ import com.ormediagroup.youngplus.fragment.AboutFragment;
 import com.ormediagroup.youngplus.fragment.BaseFragment;
 import com.ormediagroup.youngplus.fragment.ContactFragment;
 import com.ormediagroup.youngplus.fragment.HomeFragment;
-import com.ormediagroup.youngplus.fragment.HomeFragment2;
 import com.ormediagroup.youngplus.fragment.LoginFragment;
 import com.ormediagroup.youngplus.fragment.PromotionFragment;
 import com.ormediagroup.youngplus.fragment.RegisterFragment;
@@ -68,7 +66,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         HomeFragment.onHomeFragmentListener,
-        HomeFragment2.onHomeFragmentListener,
         ServiceDetailFragment.setOnServiceDetailFragmentListener,
         ServiceWebviewClient.ServiceWebviewListener {
 
@@ -192,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void showHomeContent() {
-        Fragment home = new HomeFragment2();
+        Fragment home = new HomeFragment();
 //        Fragment home = new PromotionFragment();
 //        Fragment home = new RegisterFragment();
 //        Fragment home = new LoginFragment();
