@@ -53,8 +53,8 @@ public class LoginFragment extends BaseFragment {
                         public void onComplete(JSONObject json) {
                             try {
                                 if (json.getInt("rc") == 0) {
-                                    dialog.completed("登入成功", 2000);
-                                    dialog.getDialog(1).setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                    dialog.loadingToSuccess("登入成功");
+                                    dialog.getDialog(0).setOnDismissListener(new DialogInterface.OnDismissListener() {
                                         @Override
                                         public void onDismiss(DialogInterface dialog) {
                                             Toast.makeText(mActivity, "success???", Toast.LENGTH_SHORT).show();
@@ -62,16 +62,16 @@ public class LoginFragment extends BaseFragment {
                                     });
                                     Log.i(TAG, "onComplete: json = " + json.getJSONObject("data"));
                                 } else {
-                                    dialog.failed("登入失敗，賬戶或密碼錯誤", 2000);
+                                    dialog.loadingToFailed("登入失敗，賬戶或密碼錯誤");
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
-                                dialog.failed("請檢查網絡連接", 2000);
+                                dialog.loadingToFailed("請檢查網絡連接");
                             }
                         }
                     });
                 } else {
-                    dialog.warning("請不要留空", 1000);
+                    dialog.warning("請不要留空");
                 }
             }
         });

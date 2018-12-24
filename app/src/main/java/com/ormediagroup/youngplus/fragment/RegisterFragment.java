@@ -61,31 +61,30 @@ public class RegisterFragment extends BaseFragment {
                                             try {
                                                 if (json.getInt("rc") == 0) {
                                                     Log.i(TAG, "onComplete: user = " + json.getJSONObject("data"));
-                                                    dialog.completed("註冊成功", 2000);
+                                                    dialog.loadingToSuccess("註冊成功");
                                                 } else {
-                                                    dialog.failed("註冊失敗，姓名或電郵已存在。如有疑問，請聯絡Young+客服。", 3000);
+                                                    dialog.loadingToFailed("註冊失敗，姓名或電郵已存在。如有疑問，請聯絡Young+客服。");
                                                 }
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
-                                                dialog.failed("請檢查網絡連接", 2000);
+                                                dialog.loadingToFailed("請檢查網絡連接");
                                             }
                                         }
                                     });
                                 } else {
-                                    dialog.warning("兩次密碼輸入不一致", 1000);
+                                    dialog.warning("兩次密碼輸入不一致");
                                 }
                             } else {
-                                dialog.warning("密碼長度6~16位", 1000);
+                                dialog.warning("密碼長度6~16位");
                             }
                         } else {
-                            dialog.warning("請輸入8~11位電話號碼", 1000);
+                            dialog.warning("請輸入8~11位電話號碼");
                         }
-
                     } else {
-                        dialog.warning("請輸入正確的電郵", 1000);
+                        dialog.warning("請輸入正確的電郵");
                     }
                 } else {
-                    dialog.warning("請不要留空", 1000);
+                    dialog.warning("請不要留空");
                 }
             }
         });

@@ -261,10 +261,10 @@ public class MainActivity extends AppCompatActivity implements
                     FragmentManager fm = getSupportFragmentManager();
                     if (fm.getBackStackEntryCount() >= 2) {
                         replaceFragment(ServiceDetailFragment.newInstance(DetailID),
-                                "detail", true);
+                                "detail_" + DetailID, true);
                     } else {
                         addFragment(ServiceDetailFragment.newInstance(DetailID),
-                                "detail", true);
+                                "detail_" + DetailID, true);
                     }
                     initDrawerHandle();
                 } else if (JumpType.equals("home")) {
@@ -553,12 +553,15 @@ public class MainActivity extends AppCompatActivity implements
     private void replaceFragment(Fragment f, String tag, boolean addToBackStack) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
+        Fragment f1 = fm.findFragmentByTag(tag);
+        f1 = f1 != null ? f1 : f;
         ft.setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left);
-        ft.replace(R.id.frameLayout, f, tag);
+        ft.replace(R.id.frameLayout, f1, tag);
         if (addToBackStack) {
             ft.addToBackStack(tag);
         }
         ft.commit();
+
         Log.i(TAG, "replaceFragment: count = " + fm.getBackStackEntryCount());
     }
 
@@ -577,7 +580,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void toDetail(int id) {
-        addFragment(ServiceDetailFragment.newInstance(id), "detail", true);
+        addFragment(ServiceDetailFragment.newInstance(id), "detail_" + id, true);
     }
 
     @Override
@@ -592,7 +595,7 @@ public class MainActivity extends AppCompatActivity implements
         if (title.equals("聯絡young")) {
             replaceFragment(new ContactFragment(), "contact", true);
         } else {
-            replaceFragment(ServiceDetailFragment.newInstance(title, url), "detail", true);
+            replaceFragment(ServiceDetailFragment.newInstance(title, url), "detail_" + title, true);
         }
     }
 

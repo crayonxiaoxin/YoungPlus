@@ -12,11 +12,11 @@
         android:src="@drawable/success"/>
 
     <TextView
-        android:id="@+id/tips"
+        android:id="@+id/prompt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:textSize="18sp"
         android:textColor="@color/styleColor"
-        android:text="tips" />
+        android:text="prompt" />
 </LinearLayout>

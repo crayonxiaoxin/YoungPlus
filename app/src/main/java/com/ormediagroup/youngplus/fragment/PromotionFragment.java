@@ -78,28 +78,28 @@ public class PromotionFragment extends BaseFragment {
                                 public void onComplete(JSONObject json) {
                                     try {
                                         if (json.getInt("rc") == 0) {
-                                            dialog.completed("提交成功", 2000);
+                                            dialog.loadingToSuccess( "提交成功");
                                             promotionName.setText("");
                                             promotionPhone.setText("");
                                             promotionEmail.setText("");
                                         } else {
-                                            dialog.failed("提交失敗，請聯絡Young+客服", 2000);
+                                            dialog.loadingToFailed( "提交失敗，請聯絡Young+客服");
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
-                                        dialog.failed("請檢查網絡連接", 2000);
+                                        dialog.loadingToFailed( "請檢查網絡連接");
                                     }
                                 }
                             });
                         } else {
-                            dialog.warning("請輸入正確的電郵", 1000);
+                            dialog.warning("請輸入正確的電郵");
                         }
                     } else {
-                        dialog.warning("請輸入8~11位電話號碼", 1000);
+                        dialog.warning("請輸入8~11位電話號碼");
                     }
 
                 } else {
-                    dialog.warning("請不要留空", 1000);
+                    dialog.warning("請不要留空");
                 }
             }
         });

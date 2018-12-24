@@ -6,17 +6,29 @@
     android:orientation="vertical"
     android:padding="40dp">
 
-    <ProgressBar
+    <LinearLayout
+        android:id="@+id/replace_part"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:indeterminateDrawable="@drawable/shape_progressbar" />
+        android:orientation="vertical">
+
+        <ProgressBar
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:indeterminateDrawable="@drawable/shape_progressbar" />
+    </LinearLayout>
+
+    <!--<ProgressBar-->
+    <!--android:layout_width="50dp"-->
+    <!--android:layout_height="50dp"-->
+    <!--android:indeterminateDrawable="@drawable/shape_progressbar" />-->
 
     <TextView
-        android:id="@+id/tips"
+        android:id="@+id/prompt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="tips"
+        android:text="prompt"
         android:textColor="@color/styleColor"
         android:textSize="18sp" />
 </LinearLayout>
