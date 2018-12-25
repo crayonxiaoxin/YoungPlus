@@ -1,17 +1,22 @@
 package com.ormediagroup.youngplus;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -91,12 +96,29 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main2);
+        setContentView(R.layout.activity_main);
         initView();
         initData();
+//        requestPermissions(); // test
         if (checkGooglePlayServices()) {
             initFCM();
             receiveIntent();
+        }
+    }
+
+    private void requestPermissions() {
+        requestWhatPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, "您禁用了文件讀寫權限");
+    }
+
+    private void requestWhatPermission(String permission, int requestCode, String refusedPrompt) {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission)) {
+                if (refusedPrompt != null) {
+                    Toast.makeText(MainActivity.this, refusedPrompt, Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
+            }
         }
     }
 
@@ -505,6 +527,20 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted
+                } else {
+                    // permission denied
+                }
+                break;
+        }
+    }
+
     private void setDrawerFullScreen() {
         ViewGroup.LayoutParams sidebarParams = sidebar.getLayoutParams();
         sidebarParams.width = LauUtil.getScreenWidth(MainActivity.this);
@@ -551,15 +587,16 @@ public class MainActivity extends AppCompatActivity implements
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         Fragment f1 = fm.findFragmentByTag(tag);
-        f1 = f1 != null ? f1 : f;
-        ft.setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left);
-        ft.replace(R.id.frameLayout, f1, tag);
-        if (addToBackStack) {
-            ft.addToBackStack(tag);
+        if (f1 == null) {
+            ft.setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left);
+            ft.replace(R.id.frameLayout, f, tag);
+            if (addToBackStack) {
+                ft.addToBackStack(tag);
+            }
+            ft.commit();
+        } else {
+            fm.popBackStack(tag, 0);
         }
-        ft.commit();
-
-        Log.i(TAG, "replaceFragment: count = " + fm.getBackStackEntryCount());
     }
 
     private void addFragment(Fragment f, String tag, boolean addToBackStack) {
@@ -572,7 +609,6 @@ public class MainActivity extends AppCompatActivity implements
             ft.addToBackStack(tag);
         }
         ft.commit();
-        Log.i(TAG, "addFragment: count = " + fm.getBackStackEntryCount());
     }
 
     @Override
@@ -588,7 +624,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void toDetailByTitle(String title, String url) {
-//        Toast.makeText(MainActivity.this, "url => " + title, Toast.LENGTH_SHORT).show();
         if (title.equals("聯絡young")) {
             replaceFragment(new ContactFragment(), "contact", true);
         } else {
