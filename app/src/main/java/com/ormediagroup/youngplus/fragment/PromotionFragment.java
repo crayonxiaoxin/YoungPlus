@@ -1,5 +1,6 @@
 package com.ormediagroup.youngplus.fragment;
 
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ public class PromotionFragment extends BaseFragment {
     private Button promotionSubmit;
 
     private String SUBMIT_URL = "http://youngplus.com.hk/app-promotion";
+    private LinearLayout promotionPanel;
 
     @Nullable
     @Override
@@ -78,28 +80,46 @@ public class PromotionFragment extends BaseFragment {
                                 public void onComplete(JSONObject json) {
                                     try {
                                         if (json.getInt("rc") == 0) {
-                                            dialog.loadingToSuccess( "提交成功");
-                                            promotionName.setText("");
-                                            promotionPhone.setText("");
-                                            promotionEmail.setText("");
+                                            dialog.loadingToSuccess("提交成功").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                                @Override
+                                                public void onDismiss(DialogInterface dialog) {
+                                                    promotionName.setText("");
+                                                    promotionPhone.setText("");
+                                                    promotionEmail.setText("");
+                                                }
+                                            });
                                         } else {
-                                            dialog.loadingToFailed( "提交失敗，請聯絡Young+客服");
+                                            dialog.loadingToFailed("提交失敗，請聯絡Young+客服");
                                         }
                                     } catch (JSONException e) {
                                         e.printStackTrace();
-                                        dialog.loadingToFailed( "請檢查網絡連接");
+                                        dialog.loadingToFailed("請檢查網絡連接");
                                     }
                                 }
                             });
                         } else {
-                            dialog.warning("請輸入正確的電郵");
+                            dialog.warning("請輸入正確的電郵").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    promotionEmail.requestFocus();
+                                }
+                            });
                         }
                     } else {
-                        dialog.warning("請輸入8~11位電話號碼");
+                        dialog.warning("請輸入8~11位電話號碼").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                promotionPhone.requestFocus();
+                            }
+                        });
                     }
-
                 } else {
-                    dialog.warning("請不要留空");
+                    dialog.warning("請不要留空").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            LauUtil.loopEditTexts(promotionPanel).requestFocus();
+                        }
+                    });
                 }
             }
         });
@@ -113,6 +133,7 @@ public class PromotionFragment extends BaseFragment {
         promotionPhone = view.findViewById(R.id.promotion_phone);
         promotionEmail = view.findViewById(R.id.promotion_email);
         promotionSubmit = view.findViewById(R.id.promotion_submit);
+        promotionPanel = view.findViewById(R.id.promotion_panel);
     }
 
 }

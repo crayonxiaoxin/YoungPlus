@@ -9,6 +9,7 @@ import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -85,6 +86,36 @@ public class LauUtil {
 
     public static boolean isPhone(String phone) {
         return !(phone.contains(" ") || phone.length() < 8 || phone.length() > 11);
+    }
+
+    // not use
+    public static void unfilledEditTextFocus(EditText[] ets) {
+        for (EditText t : ets) {
+            if (isNull(t)) {
+                t.requestFocus();
+                return;
+            }
+        }
+    }
+
+    // loop and get no value editText
+    public static EditText loopEditTexts(ViewGroup vg) {
+        EditText et = null;
+        for (int i = 0; i < vg.getChildCount(); i++) {
+            View child = vg.getChildAt(i);
+            if (child instanceof EditText) {
+                EditText e = (EditText) child;
+                if (isNull(e)) {
+                    return e;
+                }
+            } else if (child instanceof ViewGroup) {
+                et = loopEditTexts((ViewGroup) child);
+                if (et != null) {
+                    break;
+                }
+            }
+        }
+        return et;
     }
 
 }

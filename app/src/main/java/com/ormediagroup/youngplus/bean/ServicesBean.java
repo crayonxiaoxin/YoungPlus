@@ -1,16 +1,22 @@
 package com.ormediagroup.youngplus.bean;
 
 /**
- * Created by Lau on 2018/11/26.
+ * Created by Lau on 2018/12/7.
  */
 
-public class ServicesBean {
+public class ServicesBean extends BaseBean {
+
     private int ID;
     private String title;
     private String img;
     private int detailID;
 
-    public ServicesBean(int ID, String title, String img, int detailID) {
+    public ServicesBean(int type) {
+        super(type);
+    }
+
+    public ServicesBean(int type, int ID, String title, String img, int detailID) {
+        super(type);
         this.ID = ID;
         this.title = title;
         this.img = img;

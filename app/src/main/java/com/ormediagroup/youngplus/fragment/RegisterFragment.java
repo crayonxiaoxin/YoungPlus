@@ -1,5 +1,6 @@
 package com.ormediagroup.youngplus.fragment;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.ormediagroup.youngplus.R;
 import com.ormediagroup.youngplus.lau.LauUtil;
@@ -27,6 +29,7 @@ public class RegisterFragment extends BaseFragment {
     private Button registerSubmit;
 
     private String SUBMIT_URL = "http://youngplus.com.hk/app-register/";
+    private LinearLayout registerPanel;
 
     @Nullable
     @Override
@@ -45,10 +48,11 @@ public class RegisterFragment extends BaseFragment {
                 if (!LauUtil.isNull(registerName) && !LauUtil.isNull(registerPhone)
                         && !LauUtil.isNull(registerEmail) && !LauUtil.isNull(registerPass)
                         && !LauUtil.isNull(registerPassAgain)) {
-                    if (LauUtil.isEmail(registerEmail.getText().toString().trim())) {
-                        String password = registerPass.getText().toString();
-                        String passwordAgain = registerPassAgain.getText().toString();
-                        if (LauUtil.isPhone(registerPhone.getText().toString().trim())) {
+                    if (LauUtil.isPhone(registerPhone.getText().toString().trim())) {
+                        if (LauUtil.isEmail(registerEmail.getText().toString().trim())) {
+                            String password = registerPass.getText().toString();
+                            String passwordAgain = registerPassAgain.getText().toString();
+
                             if (!password.contains(" ") && password.length() >= 6 && password.length() <= 16) {
                                 if (passwordAgain.equals(password)) {
                                     dialog.loading("請稍候...");
@@ -63,7 +67,7 @@ public class RegisterFragment extends BaseFragment {
                                                     Log.i(TAG, "onComplete: user = " + json.getJSONObject("data"));
                                                     dialog.loadingToSuccess("註冊成功");
                                                 } else {
-                                                    dialog.loadingToFailed("註冊失敗，姓名或電郵已存在。如有疑問，請聯絡Young+客服。");
+                                                    dialog.loadingToFailed("註冊失敗，電郵已存在。如有疑問，請聯絡Young+客服。");
                                                 }
                                             } catch (JSONException e) {
                                                 e.printStackTrace();
@@ -72,19 +76,44 @@ public class RegisterFragment extends BaseFragment {
                                         }
                                     });
                                 } else {
-                                    dialog.warning("兩次密碼輸入不一致");
+                                    dialog.warning("兩次密碼輸入不一致").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                        @Override
+                                        public void onDismiss(DialogInterface dialog) {
+                                            registerPassAgain.requestFocus();
+                                        }
+                                    });
                                 }
                             } else {
-                                dialog.warning("密碼長度6~16位");
+                                dialog.warning("密碼長度6~16位").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                    @Override
+                                    public void onDismiss(DialogInterface dialog) {
+                                        registerPass.requestFocus();
+                                    }
+                                });
                             }
                         } else {
-                            dialog.warning("請輸入8~11位電話號碼");
+                            dialog.warning("請輸入正確的電郵").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    registerEmail.requestFocus();
+                                }
+                            });
                         }
                     } else {
-                        dialog.warning("請輸入正確的電郵");
+                        dialog.warning("請輸入8~11位電話號碼").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                registerPhone.requestFocus();
+                            }
+                        });
                     }
                 } else {
-                    dialog.warning("請不要留空");
+                    dialog.warning("請不要留空").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            LauUtil.loopEditTexts(registerPanel).requestFocus();
+                        }
+                    });
                 }
             }
         });
@@ -97,5 +126,6 @@ public class RegisterFragment extends BaseFragment {
         registerPass = view.findViewById(R.id.register_pass);
         registerPassAgain = view.findViewById(R.id.register_pass_again);
         registerSubmit = view.findViewById(R.id.register_submit);
+        registerPanel = view.findViewById(R.id.register_panel);
     }
 }

@@ -20,7 +20,7 @@ import android.widget.LinearLayout;
 import com.ormediagroup.youngplus.R;
 import com.ormediagroup.youngplus.adapter.CarouselPagerAdapter;
 import com.ormediagroup.youngplus.bean.BannerBean;
-import com.ormediagroup.youngplus.bean.ServicesBean2;
+import com.ormediagroup.youngplus.bean.ServicesBean;
 import com.ormediagroup.youngplus.lau.CommonHolder;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.loadAndRetry.LoadingAndRetryManager;
@@ -48,7 +48,7 @@ public class HomeFragment extends BaseFragment {
     private LoadingAndRetryManager loadingAndRetryManager;
     private LinearLayout parentLayout;
     private RecyclerView homeRecyclerView;
-    private MultiViewCommonAdapter<ServicesBean2> serviceAdapter;
+    private MultiViewCommonAdapter<ServicesBean> serviceAdapter;
 
     private final static int HOME_AD_LOOP = 1;
     private String SERVICE_URL = "http://youngplus.com.hk/app-get-services";
@@ -145,16 +145,16 @@ public class HomeFragment extends BaseFragment {
 
                         }
                     });
-                    List<ServicesBean2> aceServiceList = new ArrayList<>();
-                    aceServiceList.add(new ServicesBean2(1, -1, "皇牌服務", "", -1));
-                    List<ServicesBean2> healthManagementList = new ArrayList<>();
-                    healthManagementList.add(new ServicesBean2(1, -1, "全方位健康管理", "", -1));
+                    List<ServicesBean> aceServiceList = new ArrayList<>();
+                    aceServiceList.add(new ServicesBean(1, -1, "皇牌服務", "", -1));
+                    List<ServicesBean> healthManagementList = new ArrayList<>();
+                    healthManagementList.add(new ServicesBean(1, -1, "全方位健康管理", "", -1));
                     try {
                         JSONArray aceServices = json.getJSONObject("data").getJSONArray("aceServices");
                         JSONArray healthManagement = json.getJSONObject("data").getJSONArray("healthManagement");
                         for (int i = 0; i < aceServices.length(); i++) {
                             JSONObject obj = aceServices.getJSONObject(i);
-                            aceServiceList.add(new ServicesBean2(
+                            aceServiceList.add(new ServicesBean(
                                     2,
                                     obj.getInt("id"),
                                     obj.getString("title"),
@@ -164,7 +164,7 @@ public class HomeFragment extends BaseFragment {
                         }
                         for (int i = 0; i < healthManagement.length(); i++) {
                             JSONObject obj = healthManagement.getJSONObject(i);
-                            healthManagementList.add(new ServicesBean2(
+                            healthManagementList.add(new ServicesBean(
                                     2,
                                     obj.getInt("id"),
                                     obj.getString("title"),
@@ -176,9 +176,9 @@ public class HomeFragment extends BaseFragment {
                         e.printStackTrace();
                     }
                     aceServiceList.addAll(healthManagementList);
-                    serviceAdapter = new MultiViewCommonAdapter<ServicesBean2>(mActivity, aceServiceList) {
+                    serviceAdapter = new MultiViewCommonAdapter<ServicesBean>(mActivity, aceServiceList) {
                         @Override
-                        public int setItemViewType(ServicesBean2 bean) {
+                        public int setItemViewType(ServicesBean bean) {
                             return bean.getType();
                         }
 
@@ -195,7 +195,7 @@ public class HomeFragment extends BaseFragment {
                         }
 
                         @Override
-                        public void convert(final Context context, CommonHolder holder, int position, final ServicesBean2 bean, int viewType) {
+                        public void convert(final Context context, CommonHolder holder, int position, final ServicesBean bean, int viewType) {
                             switch (viewType) {
                                 case 1:
                                     holder.setText(R.id.big_title, bean.getTitle());

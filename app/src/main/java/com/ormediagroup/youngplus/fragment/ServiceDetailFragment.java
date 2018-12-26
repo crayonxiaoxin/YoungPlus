@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -25,6 +26,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.ormediagroup.youngplus.MainActivity;
 import com.ormediagroup.youngplus.R;
@@ -118,6 +120,8 @@ public class ServiceDetailFragment extends BaseFragment {
     }
 
     private void initData() {
+//        SharedPreferences sp = mActivity.getSharedPreferences("user_info", Context.MODE_PRIVATE);
+//        Toast.makeText(mActivity,"id="+sp.getString("userid",""),Toast.LENGTH_SHORT).show();
         Bundle bundle = getArguments();
         if (bundle != null) {
             String param;

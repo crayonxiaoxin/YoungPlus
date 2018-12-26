@@ -2,36 +2,19 @@ package com.ormediagroup.youngplus.lau;
 
 import android.app.AlarmManager;
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-
-import com.ormediagroup.youngplus.MainActivity;
-import com.ormediagroup.youngplus.R;
-import com.ormediagroup.youngplus.network.JSONResponse;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by Lau on 2018/12/18.
@@ -159,7 +142,9 @@ public class AlarmService extends Service {
             i.putExtra("content", content);
         }
         PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, 0);
-        manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+        if (manager != null) {
+            manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+        }
     }
 
     private SimpleDateFormat getRealFormat(String pattern) {

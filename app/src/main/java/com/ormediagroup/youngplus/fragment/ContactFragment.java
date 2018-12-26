@@ -1,6 +1,7 @@
 package com.ormediagroup.youngplus.fragment;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.InputType;
@@ -63,6 +64,7 @@ public class ContactFragment extends BaseFragment {
                 Toast.makeText(mActivity, bookName.getText() + " " + bookPhone.getText() +
                         " " + bookSex.getSelectedItem() + " " + bookDate.getText() + " " +
                         bookTime.getSelectedItem() + " " + bookService.getSelectedItem(), Toast.LENGTH_SHORT).show();
+//                sendEmail();
             }
         });
         contactSubmit.setOnClickListener(new View.OnClickListener() {
@@ -111,5 +113,14 @@ public class ContactFragment extends BaseFragment {
         DatePicker datePicker = datePickerDialog.getDatePicker();
         datePicker.setMinDate(System.currentTimeMillis() - 1000);
         datePickerDialog.show();
+    }
+
+    private void sendEmail() {
+        Intent i = new Intent(Intent.ACTION_SEND);
+        i.setType("message/rfc822");
+        i.putExtra(Intent.EXTRA_EMAIL, new String[]{"lau@efortunetech.com"});
+        i.putExtra(Intent.EXTRA_SUBJECT, "test subject");
+        i.putExtra(Intent.EXTRA_TEXT, "body of email");
+        startActivity(Intent.createChooser(i, "发送电邮"));
     }
 }

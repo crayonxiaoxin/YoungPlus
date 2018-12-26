@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Rect;
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements
     private Button bookSubmit;
     private EditText bookDate, bookName, bookPhone;
     private LinearLayout bookNowPart;
+    private SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +154,10 @@ public class MainActivity extends AppCompatActivity implements
             public void onSuccess(InstanceIdResult instanceIdResult) {
                 String newToken = instanceIdResult.getToken();
                 Log.i(TAG, "onSuccess: token = " + newToken);
+                sp = getSharedPreferences("user_info", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sp.edit();
+                editor.putString("token", newToken);
+                editor.apply();
             }
         });
 
@@ -391,6 +397,7 @@ public class MainActivity extends AppCompatActivity implements
                         for (int i = 0; i < aceServices.length(); i++) {
                             JSONObject obj = aceServices.getJSONObject(i);
                             aceServiceList.add(new ServicesBean(
+                                    0,
                                     obj.getInt("id"),
                                     obj.getString("title"),
                                     obj.getString("img"),
@@ -400,6 +407,7 @@ public class MainActivity extends AppCompatActivity implements
                         for (int i = 0; i < healthManagement.length(); i++) {
                             JSONObject obj = healthManagement.getJSONObject(i);
                             healthManagementList.add(new ServicesBean(
+                                    0,
                                     obj.getInt("id"),
                                     obj.getString("title"),
                                     obj.getString("img"),
@@ -413,11 +421,11 @@ public class MainActivity extends AppCompatActivity implements
                     child = new ArrayList<List<ServicesBean>>();
                     group.add(new MenuBean("皇牌服務", 0));
                     group.add(new MenuBean("全方位健康管理", 0));
+                    group.add(new MenuBean("Promotion", 3));
                     group.add(new MenuBean("關於Young+", 1));
                     group.add(new MenuBean("聯絡Young+", 2));
 
                     // test
-                    group.add(new MenuBean("test-promotion", 3));
                     group.add(new MenuBean("test-register", 4));
                     group.add(new MenuBean("test-login", 5));
 
@@ -425,9 +433,9 @@ public class MainActivity extends AppCompatActivity implements
                     child.add(healthManagementList);
                     child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
+                    child.add(new ArrayList<ServicesBean>());
 
                     // test
-                    child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
 
@@ -630,6 +638,4 @@ public class MainActivity extends AppCompatActivity implements
             replaceFragment(ServiceDetailFragment.newInstance(title, url), "detail_" + title, true);
         }
     }
-
-
 }
