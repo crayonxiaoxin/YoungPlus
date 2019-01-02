@@ -1,24 +1,15 @@
 package com.ormediagroup.youngplus.lau;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Build;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 
-import com.ormediagroup.youngplus.MainActivity;
-import com.ormediagroup.youngplus.R;
-
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -114,6 +105,9 @@ public class LauUtil {
                     break;
                 }
             }
+        }
+        if (et != null) {
+            et.requestFocus();
         }
         return et;
     }

@@ -12,10 +12,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.ormediagroup.youngplus.R;
+import com.ormediagroup.youngplus.lau.LauUtil;
 
 import java.util.Calendar;
 
@@ -28,6 +30,7 @@ public class ContactFragment extends BaseFragment {
     private EditText bookName, contactName, bookPhone, contactPhone, contactMsg, bookDate;
     private Spinner bookSex, contactSex, bookService, contactService, bookTime;
     private Button bookSubmit, contactSubmit;
+    private LinearLayout bookPanel1, bookPanel2;
 
     @Nullable
     @Override
@@ -65,6 +68,8 @@ public class ContactFragment extends BaseFragment {
                         " " + bookSex.getSelectedItem() + " " + bookDate.getText() + " " +
                         bookTime.getSelectedItem() + " " + bookService.getSelectedItem(), Toast.LENGTH_SHORT).show();
 //                sendEmail();
+                LauUtil.loopEditTexts(bookPanel1);
+
             }
         });
         contactSubmit.setOnClickListener(new View.OnClickListener() {
@@ -73,6 +78,7 @@ public class ContactFragment extends BaseFragment {
                 Toast.makeText(mActivity, contactName.getText() + " " + contactPhone.getText() +
                         " " + contactSex.getSelectedItem() + " " + contactService.getSelectedItem() +
                         " " + contactMsg.getText(), Toast.LENGTH_SHORT).show();
+                LauUtil.loopEditTexts(bookPanel2);
             }
         });
     }
@@ -91,6 +97,8 @@ public class ContactFragment extends BaseFragment {
         contactMsg = view.findViewById(R.id.contact_msg);
         bookSubmit = view.findViewById(R.id.book_submit1);
         contactSubmit = view.findViewById(R.id.book_submit2);
+        bookPanel1 = view.findViewById(R.id.bookPanel1);
+        bookPanel2 = view.findViewById(R.id.bookPanel2);
     }
 
     private void setSpinner(Spinner spinner, String[] array) {

@@ -57,6 +57,7 @@ import com.ormediagroup.youngplus.fragment.LoginFragment;
 import com.ormediagroup.youngplus.fragment.PromotionFragment;
 import com.ormediagroup.youngplus.fragment.RegisterFragment;
 import com.ormediagroup.youngplus.fragment.ServiceDetailFragment;
+import com.ormediagroup.youngplus.notuse.TestFragment;
 import com.ormediagroup.youngplus.lau.AlarmService;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.lau.ServiceWebviewClient;
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements
     private int StaticID = -1;
     private boolean isExit = false;
 
-    private ImageView toHome, topLogo, bookNow, toggle, toggle_side;
+    private ImageView toHome, topLogo, bookNow, toggle, toggleSide;
     private LinearLayout bookPanel, bookPart, sidebar;
     private Spinner bookSex, bookService, bookTime;
     private ExpandableListView sidebar_menu;
@@ -197,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements
         sidebar_menu = findViewById(R.id.sidebar_menu);
         toHome = findViewById(R.id.toHome);
         toggle = findViewById(R.id.top_toggle);
-        toggle_side = findViewById(R.id.side_toggle);
+        toggleSide = findViewById(R.id.side_toggle);
         bookNowPart = findViewById(R.id.bookNowPart);
     }
 
@@ -218,9 +219,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void showHomeContent() {
         Fragment home = new HomeFragment();
-//        Fragment home = new PromotionFragment();
-//        Fragment home = new RegisterFragment();
-//        Fragment home = new LoginFragment();
+//        Fragment home = new TestFragment();
         replaceFragment(home, "home", true);
     }
 
@@ -307,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements
                 drawerLayout.openDrawer(GravityCompat.END);
             }
         });
-        toggle_side.setOnClickListener(new View.OnClickListener() {
+        toggleSide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 drawerLayout.closeDrawer(GravityCompat.END);
@@ -379,6 +378,7 @@ public class MainActivity extends AppCompatActivity implements
                         bookPhone.getText() + " " + bookSex.getSelectedItem() + " " +
                         bookDate.getText() + " " + bookTime.getSelectedItem() + " " +
                         bookService.getSelectedItem(), Toast.LENGTH_SHORT).show();
+                LauUtil.loopEditTexts(bookPanel);
             }
         });
     }
