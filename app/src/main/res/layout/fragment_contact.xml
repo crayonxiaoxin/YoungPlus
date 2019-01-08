@@ -155,6 +155,7 @@
                         android:id="@+id/phone1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:inputType="phone"
                         android:maxLines="1"
                         android:singleLine="true" />
                 </LinearLayout>
@@ -332,6 +333,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:inputType="phone"
                         android:maxLines="1"
                         android:singleLine="true" />
                 </LinearLayout>

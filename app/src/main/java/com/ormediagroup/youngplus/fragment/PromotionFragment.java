@@ -116,7 +116,7 @@ public class PromotionFragment extends BaseFragment {
                     dialog.warning("請不要留空").setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialog) {
-                            LauUtil.loopEditTexts(promotionPanel);
+                            LauUtil.nullEditTextFocus(promotionPanel);
                         }
                     });
                 }

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -55,8 +56,10 @@ import com.ormediagroup.youngplus.fragment.ContactFragment;
 import com.ormediagroup.youngplus.fragment.HomeFragment;
 import com.ormediagroup.youngplus.fragment.LoginFragment;
 import com.ormediagroup.youngplus.fragment.PromotionFragment;
+import com.ormediagroup.youngplus.fragment.PromotionFragment2;
 import com.ormediagroup.youngplus.fragment.RegisterFragment;
 import com.ormediagroup.youngplus.fragment.ServiceDetailFragment;
+import com.ormediagroup.youngplus.lau.ProcessingDialog;
 import com.ormediagroup.youngplus.notuse.TestFragment;
 import com.ormediagroup.youngplus.lau.AlarmService;
 import com.ormediagroup.youngplus.lau.LauUtil;
@@ -67,9 +70,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements
         HomeFragment.onHomeFragmentListener,
@@ -78,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private String TAG = "ORM";
     private String SERVICE_URL = "http://youngplus.com.hk/app-get-services";
+    private String BOOKING_URL = "http://youngplus.com.hk/app-booking";
     private boolean isMenuLoaded = false;
     private String JumpType = "";
     private int DetailID = -1;
@@ -294,6 +300,16 @@ public class MainActivity extends AppCompatActivity implements
                 } else if (JumpType.equals("home")) {
                     toHome("home", 0);
                     initDrawerHandle();
+                } else if (JumpType.equals("promotion")) {
+                    FragmentManager fm = getSupportFragmentManager();
+                    if (fm.getBackStackEntryCount() >= 2) {
+                        replaceFragment(PromotionFragment2.newInstance(DetailID),
+                                "promotion_" + DetailID, true);
+                    } else {
+                        addFragment(PromotionFragment2.newInstance(DetailID),
+                                "promotion_" + DetailID, true);
+                    }
+                    initDrawerHandle();
                 }
             }
         });
@@ -367,53 +383,101 @@ public class MainActivity extends AppCompatActivity implements
                 addDatePicker(bookDate);
             }
         });
-        String[] times = {"10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00",
-                "13:30", "14:00", "14:30", "15:00", "15:30", "14:00", "14:30", "15:00",
-                "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"};
+        ArrayList<String> timesList = new ArrayList<>();
+        for (int i = 10; i <= 18; i++) {
+            for (int j = 0; j < 60; j += 30) {
+                String formatTime = String.format("%02d", i) + ":" + String.format("%02d", j);
+                timesList.add(formatTime);
+            }
+        }
+        String[] times = new String[timesList.size()];
+        timesList.toArray(times);
         setSpinner(bookTime, times);
+        final ProcessingDialog dialog = new ProcessingDialog(MainActivity.this);
         bookSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, bookName.getText() + " " +
-                        bookPhone.getText() + " " + bookSex.getSelectedItem() + " " +
-                        bookDate.getText() + " " + bookTime.getSelectedItem() + " " +
-                        bookService.getSelectedItem(), Toast.LENGTH_SHORT).show();
-                LauUtil.loopEditTexts(bookPanel);
+                if (!LauUtil.isNull(bookName) && !LauUtil.isNull(bookPhone) && !LauUtil.isNull(bookDate)) {
+                    if (LauUtil.isPhone(bookPhone.getText().toString())) {
+                        dialog.loading("正在提交...");
+                        String sexStr = bookSex.getSelectedItem().toString().equals("男") ? "M" : "F";
+                        String param = "username=" + bookName.getText() + "&phone=" + bookPhone.getText()
+                                + "&sex=" + sexStr + "&service=" + bookService.getSelectedItem()
+                                + "&date=" + bookDate.getText() + "&time=" + bookTime.getSelectedItem()
+                                + "&action=booking";
+                        new JSONResponse(MainActivity.this, BOOKING_URL, param, new JSONResponse.onComplete() {
+                            @Override
+                            public void onComplete(JSONObject json) {
+                                try {
+                                    if (json.getInt("rc") == 0) {
+                                        Log.i(TAG, "onComplete: json = " + json);
+                                        dialog.success("提交成功").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                            @Override
+                                            public void onDismiss(DialogInterface dialog) {
+                                                bookName.setText("");
+                                                bookPhone.setText("");
+                                                bookDate.setText("");
+                                                bookSex.setSelection(0);
+                                                bookService.setSelection(0);
+                                                bookTime.setSelection(0);
+                                                hideBookPanel();
+                                            }
+                                        });
+                                    } else {
+                                        dialog.loadingToFailed("提交失敗，請聯絡Young+客服");
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                    dialog.loadingToFailed("請檢查網絡連接");
+                                }
+                            }
+                        });
+                    } else {
+                        dialog.warning("請輸入8~11位電話號碼").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                bookPhone.requestFocus();
+                            }
+                        });
+                    }
+                } else {
+                    dialog.warning("請不要留空").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                            LauUtil.nullEditTextFocus(bookPanel);
+                        }
+                    });
+                }
             }
         });
     }
 
     private void loadDrawerMenu() {
-        new JSONResponse(MainActivity.this, SERVICE_URL, "", new JSONResponse.onComplete() {
+        new JSONResponse(MainActivity.this, SERVICE_URL, "after=20181201", new JSONResponse.onComplete() {
             @Override
             public void onComplete(JSONObject json) {
                 if (!json.isNull("data")) {
                     isMenuLoaded = true;
                     List<ServicesBean> aceServiceList = new ArrayList<>();
                     List<ServicesBean> healthManagementList = new ArrayList<>();
+                    List<ServicesBean> promotionList = new ArrayList<>();
                     try {
-                        JSONArray aceServices = json.getJSONObject("data").getJSONArray("aceServices");
-                        JSONArray healthManagement = json.getJSONObject("data").getJSONArray("healthManagement");
-                        for (int i = 0; i < aceServices.length(); i++) {
-                            JSONObject obj = aceServices.getJSONObject(i);
-                            aceServiceList.add(new ServicesBean(
-                                    0,
-                                    obj.getInt("id"),
-                                    obj.getString("title"),
-                                    obj.getString("img"),
-                                    obj.getInt("detail")
+                        JSONObject data = json.getJSONObject("data");
+                        JSONArray aceServices = data.getJSONArray("aceServices");
+                        JSONArray healthManagement = data.getJSONArray("healthManagement");
+                        JSONArray promotions = data.getJSONArray("promotion");
+                        aceServiceList = getMenus(aceServices, aceServiceList);
+                        healthManagementList = getMenus(healthManagement, healthManagementList);
+                        for (int i = 0; i < promotions.length(); i++) {
+                            promotionList.add(new ServicesBean(
+                                    3,
+                                    promotions.getJSONObject(i).getInt("ID"),
+                                    promotions.getJSONObject(i).getString("title"),
+                                    "",
+                                    promotions.getJSONObject(i).getInt("detail")
                             ));
                         }
-                        for (int i = 0; i < healthManagement.length(); i++) {
-                            JSONObject obj = healthManagement.getJSONObject(i);
-                            healthManagementList.add(new ServicesBean(
-                                    0,
-                                    obj.getInt("id"),
-                                    obj.getString("title"),
-                                    obj.getString("img"),
-                                    obj.getInt("detail")
-                            ));
-                        }
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -431,7 +495,7 @@ public class MainActivity extends AppCompatActivity implements
 
                     child.add(aceServiceList);
                     child.add(healthManagementList);
-                    child.add(new ArrayList<ServicesBean>());
+                    child.add(promotionList);
                     child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
 
@@ -456,7 +520,16 @@ public class MainActivity extends AppCompatActivity implements
                     sidebar_menu.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
                         @Override
                         public boolean onChildClick(ExpandableListView parent, View v, final int groupPosition, final int childPosition, long id) {
-                            JumpType = "detail";
+                            switch (child.get(groupPosition).get(childPosition).getType()) {
+                                case 0:
+                                    JumpType = "detail";
+                                    break;
+                                case 3:
+                                    JumpType = "promotion";
+                                    break;
+                            }
+                            Log.i(TAG, "onChildClick: jumptype = " + JumpType);
+//                            JumpType = "detail";
                             DetailID = child.get(groupPosition).get(childPosition).getDetailID();
                             drawerLayout.closeDrawer(GravityCompat.END);
                             return false;
@@ -465,6 +538,25 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
         });
+    }
+
+    private List<ServicesBean> getMenus(JSONArray jsonArray, List<ServicesBean> list) {
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject obj = null;
+            try {
+                obj = jsonArray.getJSONObject(i);
+                list.add(new ServicesBean(
+                        0,
+                        obj.getInt("id"),
+                        obj.getString("title"),
+                        obj.getString("img"),
+                        obj.getInt("detail")
+                ));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return list;
     }
 
     @Override
@@ -566,11 +658,24 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void addDatePicker(final EditText editText) {
-        Calendar c = Calendar.getInstance();
+        final Calendar c = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                editText.setText(formatDateAndTime(monthOfYear + 1) + "/" + formatDateAndTime(dayOfMonth) + "/" + year);
+                SimpleDateFormat sdf = new SimpleDateFormat("EEEE", Locale.ENGLISH);
+                Calendar c2 = (Calendar) c.clone();
+                c2.set(Calendar.DATE, dayOfMonth);
+                c2.set(Calendar.MONTH, monthOfYear);
+                c2.set(Calendar.YEAR, year);
+                long timeMills = c2.getTimeInMillis();
+                String dayOfWeek = sdf.format(timeMills);
+                if (!dayOfWeek.equals("Sunday") && !dayOfWeek.equals("Saturday")) {
+                    String formatDate = formatDateAndTime(monthOfYear + 1) + "/" + formatDateAndTime(dayOfMonth) + "/" + year;
+                    editText.setText(formatDate);
+                } else {
+                    Toast.makeText(MainActivity.this, "請選擇工作日", Toast.LENGTH_SHORT).show();
+                    editText.callOnClick();
+                }
             }
         }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
         DatePicker datePicker = datePickerDialog.getDatePicker();

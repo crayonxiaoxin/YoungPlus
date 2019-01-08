@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -102,6 +103,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(this, channelId)
                         .setSmallIcon(R.mipmap.ic_youngplus)
+                        .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.mipmap.ic_youngplus))
                         .setContentTitle(title)
                         .setContentText(messageBody)
                         .setAutoCancel(true)

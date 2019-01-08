@@ -88,7 +88,7 @@ public class LoginFragment extends BaseFragment {
                     dialog.warning("請不要留空").setOnDismissListener(new DialogInterface.OnDismissListener() {
                         @Override
                         public void onDismiss(DialogInterface dialog) {
-                            LauUtil.loopEditTexts(loginPanel);
+                            LauUtil.nullEditTextFocus(loginPanel);
                         }
                     });
                 }

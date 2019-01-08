@@ -90,7 +90,7 @@ public class LauUtil {
     }
 
     // loop and get no value editText
-    public static EditText loopEditTexts(ViewGroup vg) {
+    public static EditText nullEditTextFocus(ViewGroup vg) {
         EditText et = null;
         for (int i = 0; i < vg.getChildCount(); i++) {
             View child = vg.getChildAt(i);
@@ -100,7 +100,7 @@ public class LauUtil {
                     return e;
                 }
             } else if (child instanceof ViewGroup) {
-                et = loopEditTexts((ViewGroup) child);
+                et = nullEditTextFocus((ViewGroup) child);
                 if (et != null) {
                     break;
                 }
