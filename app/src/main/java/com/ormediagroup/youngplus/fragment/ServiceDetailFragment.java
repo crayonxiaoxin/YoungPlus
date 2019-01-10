@@ -61,7 +61,7 @@ public class ServiceDetailFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_service_detail, null);
+        view = inflater.inflate(R.layout.fragment_service_detail, container, false);
         initView();
         initData();
         return view;

@@ -38,7 +38,7 @@ public class LoginFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_login, null);
+        view = inflater.inflate(R.layout.fragment_login, container, false);
         initView();
         initData();
         return view;

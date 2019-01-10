@@ -8,7 +8,11 @@ import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
+
+import com.ormediagroup.youngplus.R;
 
 import java.util.regex.Pattern;
 
@@ -110,6 +114,11 @@ public class LauUtil {
             et.requestFocus();
         }
         return et;
+    }
+
+    public static void setSpinner(Context context, Spinner spinner, String[] array) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, R.layout.support_simple_spinner_dropdown_item, array);
+        spinner.setAdapter(adapter);
     }
 
 }

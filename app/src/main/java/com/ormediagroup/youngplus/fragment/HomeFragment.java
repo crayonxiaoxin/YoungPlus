@@ -76,7 +76,7 @@ public class HomeFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_home, null);
+        view = inflater.inflate(R.layout.fragment_home, container, false);
         initView();
         initData();
         return view;
@@ -176,6 +176,7 @@ public class HomeFragment extends BaseFragment {
                         e.printStackTrace();
                     }
                     aceServiceList.addAll(healthManagementList);
+
                     serviceAdapter = new MultiViewCommonAdapter<ServicesBean>(mActivity, aceServiceList) {
                         @Override
                         public int setItemViewType(ServicesBean bean) {

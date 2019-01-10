@@ -40,7 +40,7 @@ public class PromotionFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_promotion, null);
+        view = inflater.inflate(R.layout.fragment_promotion, container, false);
         initView();
         initData();
         return view;

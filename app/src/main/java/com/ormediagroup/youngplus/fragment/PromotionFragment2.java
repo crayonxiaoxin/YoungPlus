@@ -5,7 +5,9 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
@@ -16,10 +18,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.ormediagroup.youngplus.R;
 import com.ormediagroup.youngplus.lau.LauUtil;
+import com.ormediagroup.youngplus.lau.NoAutoScrollView;
 import com.ormediagroup.youngplus.lau.ProcessingDialog;
 import com.ormediagroup.youngplus.lau.ServiceWebviewClient;
 import com.ormediagroup.youngplus.loadAndRetry.LoadingAndRetryManager;
@@ -43,9 +47,13 @@ public class PromotionFragment2 extends BaseFragment {
 
     private String REQUEST_URL = "http://youngplus.com.hk/app-get-promotions";
     private String SUBMIT_URL = "http://youngplus.com.hk/app-promotion";
+    //    private String debug = "&to=lau@efortunetech.com";
+    private String debug = "";
+
     private LinearLayout promotionPanel;
     private ScrollView promotionParentLayout;
     private LoadingAndRetryManager loadingAndRetryManager;
+    private Spinner promotionSex;
 
     public static PromotionFragment2 newInstance(int id) {
         PromotionFragment2 f = new PromotionFragment2();
@@ -58,7 +66,7 @@ public class PromotionFragment2 extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_promotion2, null);
+        view = inflater.inflate(R.layout.fragment_promotion2, container, false);
         initView();
         initData();
         return view;
@@ -83,6 +91,8 @@ public class PromotionFragment2 extends BaseFragment {
     }
 
     private void initData() {
+        String[] sex = {"男", "女"};
+        LauUtil.setSpinner(mActivity, promotionSex, sex);
         Bundle bundle = getArguments();
         if (bundle != null) {
             int id = bundle.getInt("id", 0);
@@ -107,6 +117,7 @@ public class PromotionFragment2 extends BaseFragment {
                             ws.setLoadsImagesAutomatically(true);
                             ws.setSupportZoom(false);
                             ws.setDomStorageEnabled(true);
+//                            ws.setNeedInitialFocus(false);
                             promotionMiddleDesc.setWebViewClient(new ServiceWebviewClient(mActivity));
                             final ProcessingDialog dialog = new ProcessingDialog(mActivity);
                             promotionSubmit.setOnClickListener(new View.OnClickListener() {
@@ -116,13 +127,17 @@ public class PromotionFragment2 extends BaseFragment {
                                         if (LauUtil.isPhone(promotionPhone.getText().toString().trim())) {
                                             if (LauUtil.isEmail(promotionEmail.getText().toString().trim())) {
                                                 dialog.loading("正在提交...");
+                                                String sexStr = promotionSex.getSelectedItem().toString().equals("男") ? "M" : "F";
                                                 String params = "username=" + promotionName.getText().toString()
                                                         + "&userphone=" + promotionPhone.getText().toString()
                                                         + "&useremail=" + promotionEmail.getText().toString()
-                                                        + "&title=" + title;
+                                                        + "&usersex=" + sexStr
+                                                        + "&title=" + title + debug;
+                                                Log.i(TAG, "onClick: promotion params = " + params);
                                                 new JSONResponse(mActivity, SUBMIT_URL, params, new JSONResponse.onComplete() {
                                                     @Override
                                                     public void onComplete(JSONObject json) {
+                                                        Log.i(TAG, "onComplete: promotion = " + json);
                                                         try {
                                                             if (json.getInt("rc") == 0) {
                                                                 dialog.loadingToSuccess("提交成功").setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -184,9 +199,23 @@ public class PromotionFragment2 extends BaseFragment {
         promotionName = view.findViewById(R.id.promotion_name);
         promotionPhone = view.findViewById(R.id.promotion_phone);
         promotionEmail = view.findViewById(R.id.promotion_email);
+        promotionSex = view.findViewById(R.id.promotion_sex);
         promotionSubmit = view.findViewById(R.id.promotion_submit);
         promotionPanel = view.findViewById(R.id.promotion_panel);
         promotionParentLayout = view.findViewById(R.id.promotion_parent);
+
+        // 解决EditText抢占焦点问题
+        promotionParentLayout.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+        promotionParentLayout.setFocusable(true);
+        promotionParentLayout.setFocusableInTouchMode(true);
+        promotionParentLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                v.requestFocusFromTouch();
+                return false;
+            }
+        });
+
     }
 
 }

@@ -188,38 +188,38 @@
                             android:spinnerMode="dropdown"></Spinner>
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                    <!--<LinearLayout-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:orientation="horizontal">-->
 
-                        <TextView
-                            android:layout_width="80dp"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:text="日期" />
+                        <!--<TextView-->
+                            <!--android:layout_width="80dp"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_marginTop="10dp"-->
+                            <!--android:text="日期" />-->
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center_vertical"
-                            android:orientation="vertical">
+                        <!--<LinearLayout-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="wrap_content"-->
+                            <!--android:layout_gravity="center_vertical"-->
+                            <!--android:orientation="vertical">-->
 
-                            <EditText
-                                android:id="@+id/book_date"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="none"></EditText>
+                            <!--<EditText-->
+                                <!--android:id="@+id/book_date"-->
+                                <!--android:layout_width="match_parent"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:inputType="none"></EditText>-->
 
-                            <Spinner
-                                android:id="@+id/book_time"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:dropDownVerticalOffset="40dp"
-                                android:spinnerMode="dropdown"
-                                android:textAlignment="center"></Spinner>
-                        </LinearLayout>
-                    </LinearLayout>
+                            <!--<Spinner-->
+                                <!--android:id="@+id/book_time"-->
+                                <!--android:layout_width="match_parent"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:dropDownVerticalOffset="40dp"-->
+                                <!--android:spinnerMode="dropdown"-->
+                                <!--android:textAlignment="center"></Spinner>-->
+                        <!--</LinearLayout>-->
+                    <!--</LinearLayout>-->
 
                     <LinearLayout
                         android:layout_width="match_parent"

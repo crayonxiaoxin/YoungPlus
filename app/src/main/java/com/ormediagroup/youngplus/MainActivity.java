@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity implements
         ServiceWebviewClient.ServiceWebviewListener {
 
     private String TAG = "ORM";
+//    private String debug = "&to=lau@efortunetech.com";
+    private String debug = "";
     private String SERVICE_URL = "http://youngplus.com.hk/app-get-services";
     private String BOOKING_URL = "http://youngplus.com.hk/app-booking";
     private boolean isMenuLoaded = false;
@@ -92,13 +94,13 @@ public class MainActivity extends AppCompatActivity implements
 
     private ImageView toHome, topLogo, bookNow, toggle, toggleSide;
     private LinearLayout bookPanel, bookPart, sidebar;
-    private Spinner bookSex, bookService, bookTime;
+    private Spinner bookSex, bookService;
     private ExpandableListView sidebar_menu;
     private ArrayList<MenuBean> group;
     private ArrayList<List<ServicesBean>> child;
     private DrawerLayout drawerLayout;
     private Button bookSubmit;
-    private EditText bookDate, bookName, bookPhone;
+    private EditText bookName, bookPhone;
     private LinearLayout bookNowPart;
     private SharedPreferences sp;
 
@@ -195,8 +197,8 @@ public class MainActivity extends AppCompatActivity implements
         bookPanel = findViewById(R.id.bookPanel);
         bookSex = findViewById(R.id.book_sex);
         bookService = findViewById(R.id.book_service);
-        bookDate = findViewById(R.id.book_date);
-        bookTime = findViewById(R.id.book_time);
+//        bookDate = findViewById(R.id.book_date);
+//        bookTime = findViewById(R.id.book_time);
         bookName = findViewById(R.id.book_name);
         bookPhone = findViewById(R.id.book_phone);
         bookSubmit = findViewById(R.id.book_submit);
@@ -220,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initAlarmService() {
-        startService(new Intent(MainActivity.this, AlarmService.class));
+//        startService(new Intent(MainActivity.this, AlarmService.class));
     }
 
     private void showHomeContent() {
@@ -371,18 +373,20 @@ public class MainActivity extends AppCompatActivity implements
 
 
         String[] sex = {"男", "女"};
-        setSpinner(bookSex, sex);
-        String[] services = {"靶向肽療程", "逆齡療程", "營養管理計劃", "中醫診斷及配方",
-                "脊醫診斷及治療", "醫學美容", "DNA基因檢測", "全面體檢"};
-        setSpinner(bookService, services);
-        bookDate.setInputType(InputType.TYPE_NULL);
-        bookDate.setFocusable(false);
-        bookDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addDatePicker(bookDate);
-            }
-        });
+        LauUtil.setSpinner(MainActivity.this, bookSex, sex);
+//        String[] services = {"靶向肽療程", "逆齡療程", "營養管理計劃", "中醫診斷及配方",
+//                "脊醫診斷及治療", "醫學美容", "DNA基因檢測", "全面體檢"};
+        String[] services = {"抗衰老療程", "營養管理計劃", "DNA檢測", "醫療檢測",
+                "進階性美容療程", "度身訂造修身 / 體重管理"};
+        LauUtil.setSpinner(MainActivity.this, bookService, services);
+//        bookDate.setInputType(InputType.TYPE_NULL);
+//        bookDate.setFocusable(false);
+//        bookDate.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                addDatePicker(bookDate);
+//            }
+//        });
         ArrayList<String> timesList = new ArrayList<>();
         for (int i = 10; i <= 18; i++) {
             for (int j = 0; j < 60; j += 30) {
@@ -392,19 +396,18 @@ public class MainActivity extends AppCompatActivity implements
         }
         String[] times = new String[timesList.size()];
         timesList.toArray(times);
-        setSpinner(bookTime, times);
+//        setSpinner(bookTime, times);
         final ProcessingDialog dialog = new ProcessingDialog(MainActivity.this);
         bookSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!LauUtil.isNull(bookName) && !LauUtil.isNull(bookPhone) && !LauUtil.isNull(bookDate)) {
+                if (!LauUtil.isNull(bookName) && !LauUtil.isNull(bookPhone)) {
                     if (LauUtil.isPhone(bookPhone.getText().toString())) {
                         dialog.loading("正在提交...");
                         String sexStr = bookSex.getSelectedItem().toString().equals("男") ? "M" : "F";
                         String param = "username=" + bookName.getText() + "&phone=" + bookPhone.getText()
                                 + "&sex=" + sexStr + "&service=" + bookService.getSelectedItem()
-                                + "&date=" + bookDate.getText() + "&time=" + bookTime.getSelectedItem()
-                                + "&action=booking";
+                                + "&action=booking" + debug;
                         new JSONResponse(MainActivity.this, BOOKING_URL, param, new JSONResponse.onComplete() {
                             @Override
                             public void onComplete(JSONObject json) {
@@ -416,10 +419,8 @@ public class MainActivity extends AppCompatActivity implements
                                             public void onDismiss(DialogInterface dialog) {
                                                 bookName.setText("");
                                                 bookPhone.setText("");
-                                                bookDate.setText("");
                                                 bookSex.setSelection(0);
                                                 bookService.setSelection(0);
-                                                bookTime.setSelection(0);
                                                 hideBookPanel();
                                             }
                                         });
@@ -453,7 +454,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void loadDrawerMenu() {
-        new JSONResponse(MainActivity.this, SERVICE_URL, "after=20181201", new JSONResponse.onComplete() {
+        new JSONResponse(MainActivity.this, SERVICE_URL, "", new JSONResponse.onComplete() {
             @Override
             public void onComplete(JSONObject json) {
                 if (!json.isNull("data")) {
@@ -490,8 +491,8 @@ public class MainActivity extends AppCompatActivity implements
                     group.add(new MenuBean("聯絡Young+", 2));
 
                     // test
-                    group.add(new MenuBean("test-register", 4));
-                    group.add(new MenuBean("test-login", 5));
+//                    group.add(new MenuBean("test-register", 4));
+//                    group.add(new MenuBean("test-login", 5));
 
                     child.add(aceServiceList);
                     child.add(healthManagementList);
@@ -500,8 +501,8 @@ public class MainActivity extends AppCompatActivity implements
                     child.add(new ArrayList<ServicesBean>());
 
                     // test
-                    child.add(new ArrayList<ServicesBean>());
-                    child.add(new ArrayList<ServicesBean>());
+//                    child.add(new ArrayList<ServicesBean>());
+//                    child.add(new ArrayList<ServicesBean>());
 
                     sidebar_menu.setAdapter(new SidebarExpandableListAdapter(MainActivity.this, group, child));
                     sidebar_menu.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
@@ -648,10 +649,10 @@ public class MainActivity extends AppCompatActivity implements
         sidebar.setLayoutParams(sidebarParams);
     }
 
-    private void setSpinner(Spinner spinner, String[] array) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, R.layout.support_simple_spinner_dropdown_item, array);
-        spinner.setAdapter(adapter);
-    }
+//    private void setSpinner(Spinner spinner, String[] array) {
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, R.layout.support_simple_spinner_dropdown_item, array);
+//        spinner.setAdapter(adapter);
+//    }
 
     private String formatDateAndTime(int number) {
         return number < 10 ? "0" + number : "" + number;
