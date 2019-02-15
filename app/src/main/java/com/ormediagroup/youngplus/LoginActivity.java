@@ -1,21 +1,20 @@
-package com.ormediagroup.youngplus.fragment;
+package com.ormediagroup.youngplus;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Rect;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ormediagroup.youngplus.R;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.lau.ProcessingDialog;
 import com.ormediagroup.youngplus.network.JSONResponse;
@@ -23,34 +22,27 @@ import com.ormediagroup.youngplus.network.JSONResponse;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by Lau on 2018/12/20.
- */
-
-public class LoginFragment extends BaseFragment {
-    private View view;
+public class LoginActivity extends AppCompatActivity {
     private EditText loginEmail, loginPass;
     private Button loginSubmit;
 
     private String SUBMIT_URL = "http://youngplus.com.hk/app-login/";
+    private String TAG = "ORM";
     private SharedPreferences sp;
     private LinearLayout loginPanel;
-    private TextView loginRegister;
-    private TextView loginResetPass;
 
-    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_login, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
         initView();
         initData();
-        return view;
     }
 
     private void initData() {
-        sp = mActivity.getSharedPreferences("user_info", Context.MODE_PRIVATE);
+        sp = getSharedPreferences("user_info", Context.MODE_PRIVATE);
         final String token = sp.getString("token", "");
-        final ProcessingDialog dialog = new ProcessingDialog(mActivity);
+        final ProcessingDialog dialog = new ProcessingDialog(this);
         loginSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,7 +50,7 @@ public class LoginFragment extends BaseFragment {
                     dialog.loading("登入中...");
                     String params = "username=" + loginEmail.getText().toString() + "&userpass="
                             + loginPass.getText().toString() + "&token=" + token;
-                    new JSONResponse(mActivity, SUBMIT_URL, params, new JSONResponse.onComplete() {
+                    new JSONResponse(LoginActivity.this, SUBMIT_URL, params, new JSONResponse.onComplete() {
                         @Override
                         public void onComplete(JSONObject json) {
                             try {
@@ -73,11 +65,8 @@ public class LoginFragment extends BaseFragment {
                                     dialog.loadingToSuccess("登入成功").setOnDismissListener(new DialogInterface.OnDismissListener() {
                                         @Override
                                         public void onDismiss(DialogInterface dialog) {
-                                            LoginFragmentListener lfl = (LoginFragmentListener) mActivity;
-                                            if (lfl!=null){
-                                                lfl.updateLoginStatus();
-                                            }
-//                                            getFragmentManager().popBackStackImmediate(); // backPressed won't display this fragment
+                                            Toast.makeText(LoginActivity.this, "success???", Toast.LENGTH_SHORT).show();
+                                            getFragmentManager().popBackStackImmediate(); // backPressed won't display this fragment
                                         }
                                     });
                                     Log.i(TAG, "onComplete: json = " + json.getJSONObject("data"));
@@ -100,39 +89,32 @@ public class LoginFragment extends BaseFragment {
                 }
             }
         });
-        loginRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LoginFragmentListener lfl = (LoginFragmentListener) mActivity;
-                if (lfl!=null){
-                    lfl.toRegister();
-                }
-            }
-        });
-        loginResetPass.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                LoginFragmentListener lfl = (LoginFragmentListener) mActivity;
-                if (lfl!=null){
-                    lfl.toResetPass();
-                }
-            }
-        });
     }
 
     private void initView() {
-        loginEmail = view.findViewById(R.id.login_email);
-        loginPass = view.findViewById(R.id.login_pass);
-        loginSubmit = view.findViewById(R.id.login_submit);
-        loginPanel = view.findViewById(R.id.login_panel);
-        loginRegister = view.findViewById(R.id.login_register);
-        loginResetPass = view.findViewById(R.id.login_reset_pass);
+        loginEmail = findViewById(R.id.login_email);
+        loginPass = findViewById(R.id.login_pass);
+        loginSubmit = findViewById(R.id.login_submit);
+        loginPanel = findViewById(R.id.login_panel);
     }
 
-    public interface LoginFragmentListener{
-        void updateLoginStatus();
-        void toRegister();
-        void toResetPass();
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            View v = getCurrentFocus();
+            if (v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
+                    v.clearFocus();
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    if (imm != null) {
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                }
+            }
+        }
+        return super.dispatchTouchEvent(ev);
     }
 
 }

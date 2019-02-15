@@ -44,7 +44,7 @@ public class ContactFragment extends BaseFragment {
     private LinearLayout bookPanel1, bookPanel2;
 
     private String BOOKING_URL = "http://youngplus.com.hk/app-booking";
-//    private String debug = "&to=lau@efortunetech.com";
+    //    private String debug = "&to=lau@efortunetech.com";
     private String debug = "";
 
     @Nullable
@@ -58,14 +58,14 @@ public class ContactFragment extends BaseFragment {
 
     private void initData() {
         String[] sex = {"男", "女"};
-        LauUtil.setSpinner(mActivity,bookSex, sex);
-        LauUtil.setSpinner(mActivity,contactSex, sex);
+        LauUtil.setSpinner(mActivity, bookSex, sex);
+        LauUtil.setSpinner(mActivity, contactSex, sex);
 //        String[] services = {"靶向肽療程", "逆齡療程", "營養管理計劃", "中醫診斷及配方",
 //                "脊醫診斷及治療", "醫學美容", "DNA基因檢測", "全面體檢"};
-        String[] services = {"抗衰老療程", "營養管理計劃", "DNA檢測", "醫療檢測",
+        String[] services = {"- 請選擇 -","抗衰老療程", "營養管理計劃", "DNA檢測", "醫療檢測",
                 "進階性美容療程", "度身訂造修身 / 體重管理"};
-        LauUtil.setSpinner(mActivity,bookService, services);
-        LauUtil.setSpinner(mActivity,contactService, services);
+        LauUtil.setSpinner(mActivity, bookService, services);
+        LauUtil.setSpinner(mActivity, contactService, services);
 //        bookDate.setInputType(InputType.TYPE_NULL);
 //        bookDate.setFocusable(false);
 //        bookDate.setOnClickListener(new View.OnClickListener() {
@@ -92,8 +92,9 @@ public class ContactFragment extends BaseFragment {
                     if (LauUtil.isPhone(bookPhone.getText().toString())) {
                         dialog.loading("正在提交...");
                         String sexStr = bookSex.getSelectedItem().toString().equals("男") ? "M" : "F";
+                        String serviceStr = bookService.getSelectedItem().toString().equals("- 請選擇 -") ? "" : bookService.getSelectedItem().toString();
                         String param = "username=" + bookName.getText() + "&phone=" + bookPhone.getText()
-                                + "&sex=" + sexStr + "&service=" + bookService.getSelectedItem()
+                                + "&sex=" + sexStr + "&service=" + serviceStr
                                 + "&action=booking" + debug;
                         new JSONResponse(mActivity, BOOKING_URL, param, new JSONResponse.onComplete() {
                             @Override
@@ -145,8 +146,9 @@ public class ContactFragment extends BaseFragment {
                     if (LauUtil.isPhone(contactPhone.getText().toString())) {
                         dialog.loading("正在提交...");
                         String sexStr = contactSex.getSelectedItem().toString().equals("男") ? "M" : "F";
+                        String serviceStr = contactService.getSelectedItem().toString().equals("- 請選擇 -") ? "" : contactService.getSelectedItem().toString();
                         String param = "username=" + contactName.getText() + "&phone=" + contactPhone.getText()
-                                + "&sex=" + sexStr + "&service=" + contactService.getSelectedItem()
+                                + "&sex=" + sexStr + "&service=" + serviceStr
                                 + "&msg=" + contactMsg.getText() + "&action=contact" + debug;
                         new JSONResponse(mActivity, BOOKING_URL, param, new JSONResponse.onComplete() {
                             @Override

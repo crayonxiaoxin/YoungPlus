@@ -228,7 +228,7 @@
                         android:layout_width="80dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:text="服務 *" />
+                        android:text="服務" />
 
                     <Spinner
                         android:id="@+id/book_service1"

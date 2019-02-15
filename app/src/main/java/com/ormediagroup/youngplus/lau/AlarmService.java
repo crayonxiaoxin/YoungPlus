@@ -93,35 +93,34 @@ public class AlarmService extends Service {
 //            }
 //        });
 
-        title = "Young +";
-        content = "Test";
-        daily = "10:00";
+//        send("young+", "content", "17:34");
 
-        String today = getRealFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-        String[] nowTime = today.split(" ");
-
-        long delta = 0;
-        long goneTime = 0;
-        long dailyTime = 0;
-        try {
-            long timed = getRealFormat("yyyy-MM-dd HH:mm").parse(nowTime[0] + " " + daily).getTime();
-            long date = getRealFormat("yyyy-MM-dd").parse(nowTime[0]).getTime();
-            dailyTime = timed - date;
-            Log.i(TAG, "onStartCommand: timed=" + timed);
-            Log.i(TAG, "onStartCommand: date=" + date);
-            long now = getRealFormat("yyyy-MM-dd HH:mm:ss").parse(today).getTime();
-            goneTime = now - date;
-            Log.i(TAG, "onStartCommand: now=" + now);
-            Log.i(TAG, "onStartCommand: goneTime = " + goneTime);
-            delta = timed - now;
-            Log.i(TAG, "onStartCommand: delta=" + delta);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        Log.i(TAG, "onStartCommand: a day = " + 24 * 60 * 60 * 1000);
-        Log.i(TAG, "onStartCommand: next=" + (24 * 60 * 60 * 1000 - goneTime + dailyTime));
-        long newDelay = delta > 0 ? delta : 24 * 60 * 60 * 1000 - goneTime + dailyTime;
-        sendMsg(newDelay);
+//        title = "Young +";
+//        content = "Test";
+//        daily = "17:42";
+//
+//        String today = getRealFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+//        String[] nowTime = today.split(" ");
+//
+//        long delta = 0;
+//        long goneTime = 0;
+//        try {
+//            long timed = getRealFormat("yyyy-MM-dd HH:mm").parse(nowTime[0] + " " + daily).getTime();
+//            long date = getRealFormat("yyyy-MM-dd").parse(nowTime[0]).getTime();
+//            Log.i(TAG, "onStartCommand: timed=" + timed);
+//            Log.i(TAG, "onStartCommand: date=" + date);
+//            long now = getRealFormat("yyyy-MM-dd HH:mm:ss").parse(today).getTime();
+//            goneTime = now - date;
+//            Log.i(TAG, "onStartCommand: now=" + now);
+//            delta = timed - now;
+//            Log.i(TAG, "onStartCommand: delta=" + delta);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//        Log.i(TAG, "onStartCommand: next=" + (24 * 60 * 60 * 1000 - goneTime + delta));
+//        long newDelay = delta > 0 ? delta : 24 * 60 * 60 * 1000 - goneTime + delta;
+//        sendMsg(title, content, newDelay);
+        send("Young+","content","17:45");
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -131,9 +130,8 @@ public class AlarmService extends Service {
         super.onDestroy();
     }
 
-    private void sendMsg(long delay) {
+    private void sendMsg(String title, String content, long delay) {
         AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
-//        int delay = 3 * 1000;
         long triggerAtTime = SystemClock.elapsedRealtime() + delay;
         Intent i = new Intent(this, AlarmReceiver.class);
         i.putExtra("about", "test");
@@ -145,6 +143,31 @@ public class AlarmService extends Service {
         if (manager != null) {
             manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
         }
+    }
+
+    private void send(String title, String content, String daily) {
+
+        String today = getRealFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+        String[] nowTime = today.split(" ");
+
+        long delta = 0;
+        long goneTime = 0;
+        try {
+            long timed = getRealFormat("yyyy-MM-dd HH:mm").parse(nowTime[0] + " " + daily).getTime();
+            long date = getRealFormat("yyyy-MM-dd").parse(nowTime[0]).getTime();
+            Log.i(TAG, "onStartCommand: timed=" + timed);
+            Log.i(TAG, "onStartCommand: date=" + date);
+            long now = getRealFormat("yyyy-MM-dd HH:mm:ss").parse(today).getTime();
+            goneTime = now - date;
+            Log.i(TAG, "onStartCommand: now=" + now);
+            delta = timed - now;
+            Log.i(TAG, "onStartCommand: delta=" + delta);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Log.i(TAG, "onStartCommand: next=" + (24 * 60 * 60 * 1000 - goneTime + delta));
+        long newDelay = delta > 0 ? delta : 24 * 60 * 60 * 1000 - goneTime + delta;
+        sendMsg(title, content, newDelay);
     }
 
     private SimpleDateFormat getRealFormat(String pattern) {

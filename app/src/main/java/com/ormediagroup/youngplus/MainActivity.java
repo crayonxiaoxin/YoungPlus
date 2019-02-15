@@ -1,6 +1,7 @@
 package com.ormediagroup.youngplus;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -10,6 +11,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +26,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,9 +41,17 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.firebase.jobdispatcher.Constraint;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
+import com.firebase.jobdispatcher.Job;
+import com.firebase.jobdispatcher.Lifetime;
+import com.firebase.jobdispatcher.RetryStrategy;
+import com.firebase.jobdispatcher.Trigger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -58,7 +69,9 @@ import com.ormediagroup.youngplus.fragment.LoginFragment;
 import com.ormediagroup.youngplus.fragment.PromotionFragment;
 import com.ormediagroup.youngplus.fragment.PromotionFragment2;
 import com.ormediagroup.youngplus.fragment.RegisterFragment;
+import com.ormediagroup.youngplus.fragment.ResetPassFragment;
 import com.ormediagroup.youngplus.fragment.ServiceDetailFragment;
+import com.ormediagroup.youngplus.lau.MyJobService;
 import com.ormediagroup.youngplus.lau.ProcessingDialog;
 import com.ormediagroup.youngplus.notuse.TestFragment;
 import com.ormediagroup.youngplus.lau.AlarmService;
@@ -79,11 +92,12 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements
         HomeFragment.onHomeFragmentListener,
         ServiceDetailFragment.setOnServiceDetailFragmentListener,
-        ServiceWebviewClient.ServiceWebviewListener {
+        ServiceWebviewClient.ServiceWebviewListener,
+        LoginFragment.LoginFragmentListener {
 
     private String TAG = "ORM";
-//    private String debug = "&to=lau@efortunetech.com";
-    private String debug = "";
+    private String debug = "&to=lau@efortunetech.com";
+    //    private String debug = "";
     private String SERVICE_URL = "http://youngplus.com.hk/app-get-services";
     private String BOOKING_URL = "http://youngplus.com.hk/app-booking";
     private boolean isMenuLoaded = false;
@@ -211,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initData() {
+        initSP();
         setDrawerToggle();
         setDrawerFullScreen();
         setDrawerHandle();
@@ -218,11 +233,45 @@ public class MainActivity extends AppCompatActivity implements
         showHomeContent();
         setLogoAction();
         loadDrawerMenu();
-        initAlarmService();
+//        initAlarmService();
+//        initFireBaseJobDespatcher();
+    }
+
+    private void initFireBaseJobDespatcher() {
+        FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(MainActivity.this));
+        Job myJob = dispatcher.newJobBuilder()
+                // the JobService that will be called
+                .setService(MyJobService.class)
+                // uniquely identifies the job
+                .setTag("my-unique-tag")
+                // one-off job
+                .setRecurring(true)
+                // don't persist past a device reboot
+                .setLifetime(Lifetime.FOREVER)
+                // start between 0 and 60 seconds from now
+                .setTrigger(Trigger.executionWindow(0, 60))
+                // don't overwrite an existing job with the same tag
+                .setReplaceCurrent(false)
+                // retry with exponential backoff
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                // constraints that need to be satisfied for the job to run
+//                .setConstraints(
+//                        // only run on an unmetered network
+//                        Constraint.ON_UNMETERED_NETWORK,
+//                        // only run when the device is charging
+//                        Constraint.DEVICE_CHARGING
+//                )
+//                .setExtras(myExtrasBundle)
+                .build();
+        dispatcher.mustSchedule(myJob);
+    }
+
+    private void initSP() {
+        sp = getSharedPreferences("user_info", MODE_PRIVATE);
     }
 
     private void initAlarmService() {
-//        startService(new Intent(MainActivity.this, AlarmService.class));
+        startService(new Intent(MainActivity.this, AlarmService.class));
     }
 
     private void showHomeContent() {
@@ -277,15 +326,13 @@ public class MainActivity extends AppCompatActivity implements
                         case 2:
                             replaceFragment(new ContactFragment(), "contact", true);
                             break;
-                        // test
-                        case 3:
-                            replaceFragment(new PromotionFragment(), "promotion", true);
-                            break;
+
                         case 4:
-                            replaceFragment(new RegisterFragment(), "register", true);
-                            break;
-                        case 5:
-                            replaceFragment(new LoginFragment(), "login", true);
+                            if (!sp.getString("userid", "").equals("")) {
+                                showLogoutDialog();
+                            } else {
+                                replaceFragment(new LoginFragment(), "login", true);
+                            }
                             break;
                     }
                     initDrawerHandle();
@@ -315,6 +362,28 @@ public class MainActivity extends AppCompatActivity implements
                 }
             }
         });
+    }
+
+    private void showLogoutDialog() {
+        new AlertDialog.Builder(MainActivity.this)
+                .setIcon(R.mipmap.ic_youngplus)
+                .setTitle("登出")
+                .setMessage("您確定登出嗎？")
+                .setPositiveButton("確定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        sp.edit().clear().apply();
+                        dialog.dismiss();
+                        initData();
+                        new ProcessingDialog(MainActivity.this, 1000).success("您已成功登出");
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).show();
     }
 
     private void setDrawerToggle() {
@@ -376,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements
         LauUtil.setSpinner(MainActivity.this, bookSex, sex);
 //        String[] services = {"靶向肽療程", "逆齡療程", "營養管理計劃", "中醫診斷及配方",
 //                "脊醫診斷及治療", "醫學美容", "DNA基因檢測", "全面體檢"};
-        String[] services = {"抗衰老療程", "營養管理計劃", "DNA檢測", "醫療檢測",
+        String[] services = {"- 請選擇 -", "抗衰老療程", "營養管理計劃", "DNA檢測", "醫療檢測",
                 "進階性美容療程", "度身訂造修身 / 體重管理"};
         LauUtil.setSpinner(MainActivity.this, bookService, services);
 //        bookDate.setInputType(InputType.TYPE_NULL);
@@ -405,8 +474,9 @@ public class MainActivity extends AppCompatActivity implements
                     if (LauUtil.isPhone(bookPhone.getText().toString())) {
                         dialog.loading("正在提交...");
                         String sexStr = bookSex.getSelectedItem().toString().equals("男") ? "M" : "F";
-                        String param = "username=" + bookName.getText() + "&phone=" + bookPhone.getText()
-                                + "&sex=" + sexStr + "&service=" + bookService.getSelectedItem()
+                        String serviceStr = bookService.getSelectedItem().toString().equals("- 請選擇 -") ? "" : bookService.getSelectedItem().toString();
+                        String param = "username=" + bookName.getText().toString() + "&phone=" + bookPhone.getText().toString()
+                                + "&sex=" + sexStr + "&service=" + serviceStr
                                 + "&action=booking" + debug;
                         new JSONResponse(MainActivity.this, BOOKING_URL, param, new JSONResponse.onComplete() {
                             @Override
@@ -454,7 +524,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void loadDrawerMenu() {
-        new JSONResponse(MainActivity.this, SERVICE_URL, "", new JSONResponse.onComplete() {
+        new JSONResponse(MainActivity.this, SERVICE_URL, "after=20181230", new JSONResponse.onComplete() {
             @Override
             public void onComplete(JSONObject json) {
                 if (!json.isNull("data")) {
@@ -492,7 +562,11 @@ public class MainActivity extends AppCompatActivity implements
 
                     // test
 //                    group.add(new MenuBean("test-register", 4));
-//                    group.add(new MenuBean("test-login", 5));
+                    if (!sp.getString("userid", "").equals("")) {
+                        group.add(new MenuBean("登出", 4));
+                    } else {
+                        group.add(new MenuBean("登入", 4));
+                    }
 
                     child.add(aceServiceList);
                     child.add(healthManagementList);
@@ -502,7 +576,7 @@ public class MainActivity extends AppCompatActivity implements
 
                     // test
 //                    child.add(new ArrayList<ServicesBean>());
-//                    child.add(new ArrayList<ServicesBean>());
+                    child.add(new ArrayList<ServicesBean>());
 
                     sidebar_menu.setAdapter(new SidebarExpandableListAdapter(MainActivity.this, group, child));
                     sidebar_menu.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
@@ -530,12 +604,25 @@ public class MainActivity extends AppCompatActivity implements
                                     break;
                             }
                             Log.i(TAG, "onChildClick: jumptype = " + JumpType);
-//                            JumpType = "detail";
                             DetailID = child.get(groupPosition).get(childPosition).getDetailID();
                             drawerLayout.closeDrawer(GravityCompat.END);
                             return false;
                         }
                     });
+//                    TextView headerView = new TextView(MainActivity.this);
+//                    if (!sp.getString("userid", "").equals("")) {
+//                        String name = sp.getString("name", "");
+//                        if (!name.equals("")) {
+//                            headerView.setText(LauUtil.HTMLTagDecode("<font color='#2c2c2c'>您好，</font><font color='#754c24'>" + name + "</font>"));
+//                            headerView.setTextSize(18);
+//                            headerView.setGravity(Gravity.CENTER);
+//                            headerView.setPadding(0, 30, 0, 30);
+//                            sidebar_menu.addHeaderView(headerView, null, false);
+//                        }
+//                    } else {
+//                        Log.i(TAG, "onComplete: header " + sidebar_menu.getHeaderViewsCount());
+//                        sidebar_menu.removeHeaderView(headerView);
+//                    }
                 }
             }
         });
@@ -558,6 +645,14 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
         return list;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == 1) {
+            initData();
+        }
     }
 
     @Override
@@ -649,11 +744,6 @@ public class MainActivity extends AppCompatActivity implements
         sidebar.setLayoutParams(sidebarParams);
     }
 
-//    private void setSpinner(Spinner spinner, String[] array) {
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, R.layout.support_simple_spinner_dropdown_item, array);
-//        spinner.setAdapter(adapter);
-//    }
-
     private String formatDateAndTime(int number) {
         return number < 10 ? "0" + number : "" + number;
     }
@@ -743,5 +833,20 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             replaceFragment(ServiceDetailFragment.newInstance(title, url), "detail_" + title, true);
         }
+    }
+
+    @Override
+    public void updateLoginStatus() {
+        initData();
+    }
+
+    @Override
+    public void toRegister() {
+        replaceFragment(new RegisterFragment(), "register", true);
+    }
+
+    @Override
+    public void toResetPass() {
+        replaceFragment(new ResetPassFragment(), "resetPass", true);
     }
 }

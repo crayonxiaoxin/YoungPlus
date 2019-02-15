@@ -1,5 +1,6 @@
 package com.ormediagroup.youngplus.fragment;
 
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,7 +11,9 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.ormediagroup.youngplus.MainActivity;
 import com.ormediagroup.youngplus.R;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.lau.ProcessingDialog;
@@ -30,6 +33,7 @@ public class RegisterFragment extends BaseFragment {
 
     private String SUBMIT_URL = "http://youngplus.com.hk/app-register/";
     private LinearLayout registerPanel;
+    private TextView registerLogin;
 
     @Nullable
     @Override
@@ -65,7 +69,13 @@ public class RegisterFragment extends BaseFragment {
                                             try {
                                                 if (json.getInt("rc") == 0) {
                                                     Log.i(TAG, "onComplete: user = " + json.getJSONObject("data"));
-                                                    dialog.loadingToSuccess("註冊成功");
+                                                    dialog.loadingToSuccess("註冊成功").setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                                        @Override
+                                                        public void onDismiss(DialogInterface dialog) {
+                                                            initEditTexts();
+                                                            toLogin();
+                                                        }
+                                                    });
                                                 } else {
                                                     dialog.loadingToFailed("註冊失敗，電郵已存在。如有疑問，請聯絡Young+客服。");
                                                 }
@@ -117,6 +127,20 @@ public class RegisterFragment extends BaseFragment {
                 }
             }
         });
+        registerLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getFragmentManager().popBackStackImmediate();
+            }
+        });
+    }
+
+    private void initEditTexts() {
+        registerName.setText("");
+        registerPhone.setText("");
+        registerEmail.setText("");
+        registerPass.setText("");
+        registerPassAgain.setText("");
     }
 
     private void initView() {
@@ -127,5 +151,27 @@ public class RegisterFragment extends BaseFragment {
         registerPassAgain = view.findViewById(R.id.register_pass_again);
         registerSubmit = view.findViewById(R.id.register_submit);
         registerPanel = view.findViewById(R.id.register_panel);
+        registerLogin = view.findViewById(R.id.register_login);
     }
+
+    private void toLogin(){
+        new AlertDialog.Builder(mActivity)
+                .setIcon(R.mipmap.ic_youngplus)
+                .setTitle("註冊成功")
+                .setMessage("是否立即登入？")
+                .setPositiveButton("確定", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        getFragmentManager().popBackStackImmediate();
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).show();
+    }
+
 }
