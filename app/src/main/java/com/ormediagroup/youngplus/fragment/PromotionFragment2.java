@@ -22,6 +22,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.ormediagroup.youngplus.R;
+import com.ormediagroup.youngplus.lau.API;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.lau.NoAutoScrollView;
 import com.ormediagroup.youngplus.lau.ProcessingDialog;
@@ -45,8 +46,6 @@ public class PromotionFragment2 extends BaseFragment {
     private EditText promotionName, promotionPhone, promotionEmail;
     private Button promotionSubmit;
 
-    private String REQUEST_URL = "http://youngplus.com.hk/app-get-promotions";
-    private String SUBMIT_URL = "http://youngplus.com.hk/app-promotion";
     //    private String debug = "&to=lau@efortunetech.com";
     private String debug = "";
 
@@ -97,7 +96,7 @@ public class PromotionFragment2 extends BaseFragment {
         if (bundle != null) {
             int id = bundle.getInt("id", 0);
             if (id != 0) {
-                new JSONResponse(mActivity, REQUEST_URL, "id=" + id, new JSONResponse.onComplete() {
+                new JSONResponse(mActivity, API.API_GET_PROMOTION, "id=" + id, new JSONResponse.onComplete() {
                     @Override
                     public void onComplete(JSONObject json) {
                         loadingAndRetryManager.showContent();
@@ -134,7 +133,7 @@ public class PromotionFragment2 extends BaseFragment {
                                                         + "&usersex=" + sexStr
                                                         + "&title=" + title + debug;
                                                 Log.i(TAG, "onClick: promotion params = " + params);
-                                                new JSONResponse(mActivity, SUBMIT_URL, params, new JSONResponse.onComplete() {
+                                                new JSONResponse(mActivity, API.API_ADD_PROMOTION, params, new JSONResponse.onComplete() {
                                                     @Override
                                                     public void onComplete(JSONObject json) {
                                                         Log.i(TAG, "onComplete: promotion = " + json);

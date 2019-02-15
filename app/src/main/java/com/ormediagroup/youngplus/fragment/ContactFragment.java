@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.ormediagroup.youngplus.R;
+import com.ormediagroup.youngplus.lau.API;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.lau.ProcessingDialog;
 import com.ormediagroup.youngplus.network.JSONResponse;
@@ -43,7 +44,6 @@ public class ContactFragment extends BaseFragment {
     private Button bookSubmit, contactSubmit;
     private LinearLayout bookPanel1, bookPanel2;
 
-    private String BOOKING_URL = "http://youngplus.com.hk/app-booking";
     //    private String debug = "&to=lau@efortunetech.com";
     private String debug = "";
 
@@ -96,7 +96,7 @@ public class ContactFragment extends BaseFragment {
                         String param = "username=" + bookName.getText() + "&phone=" + bookPhone.getText()
                                 + "&sex=" + sexStr + "&service=" + serviceStr
                                 + "&action=booking" + debug;
-                        new JSONResponse(mActivity, BOOKING_URL, param, new JSONResponse.onComplete() {
+                        new JSONResponse(mActivity, API.API_BOOKING, param, new JSONResponse.onComplete() {
                             @Override
                             public void onComplete(JSONObject json) {
                                 try {
@@ -150,7 +150,7 @@ public class ContactFragment extends BaseFragment {
                         String param = "username=" + contactName.getText() + "&phone=" + contactPhone.getText()
                                 + "&sex=" + sexStr + "&service=" + serviceStr
                                 + "&msg=" + contactMsg.getText() + "&action=contact" + debug;
-                        new JSONResponse(mActivity, BOOKING_URL, param, new JSONResponse.onComplete() {
+                        new JSONResponse(mActivity, API.API_BOOKING, param, new JSONResponse.onComplete() {
                             @Override
                             public void onComplete(JSONObject json) {
                                 try {

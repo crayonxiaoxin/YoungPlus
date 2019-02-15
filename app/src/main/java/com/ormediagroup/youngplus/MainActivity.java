@@ -69,10 +69,13 @@ import com.ormediagroup.youngplus.fragment.LoginFragment;
 import com.ormediagroup.youngplus.fragment.PromotionFragment;
 import com.ormediagroup.youngplus.fragment.PromotionFragment2;
 import com.ormediagroup.youngplus.fragment.RegisterFragment;
+import com.ormediagroup.youngplus.fragment.ReportFragment;
 import com.ormediagroup.youngplus.fragment.ResetPassFragment;
 import com.ormediagroup.youngplus.fragment.ServiceDetailFragment;
+import com.ormediagroup.youngplus.lau.API;
 import com.ormediagroup.youngplus.lau.MyJobService;
 import com.ormediagroup.youngplus.lau.ProcessingDialog;
+import com.ormediagroup.youngplus.lau.User;
 import com.ormediagroup.youngplus.notuse.TestFragment;
 import com.ormediagroup.youngplus.lau.AlarmService;
 import com.ormediagroup.youngplus.lau.LauUtil;
@@ -96,10 +99,8 @@ public class MainActivity extends AppCompatActivity implements
         LoginFragment.LoginFragmentListener {
 
     private String TAG = "ORM";
-    private String debug = "&to=lau@efortunetech.com";
-    //    private String debug = "";
-    private String SERVICE_URL = "http://youngplus.com.hk/app-get-services";
-    private String BOOKING_URL = "http://youngplus.com.hk/app-booking";
+    //    private String debug = "&to=lau@efortunetech.com";
+    private String debug = "";
     private boolean isMenuLoaded = false;
     private String JumpType = "";
     private int DetailID = -1;
@@ -321,47 +322,46 @@ public class MainActivity extends AppCompatActivity implements
                 if (JumpType.equals("static") && StaticID != -1) {
                     switch (StaticID) {
                         case 1:
-                            replaceFragment(new AboutFragment(), "about", true);
+                            sidebarJump(new AboutFragment(), "about");
                             break;
                         case 2:
-                            replaceFragment(new ContactFragment(), "contact", true);
+                            sidebarJump(new ContactFragment(), "contact");
                             break;
 
                         case 4:
-                            if (!sp.getString("userid", "").equals("")) {
+                            if (new User(MainActivity.this).isUserLoggedIn()) {
                                 showLogoutDialog();
                             } else {
-                                replaceFragment(new LoginFragment(), "login", true);
+                                sidebarJump(new LoginFragment(), "login");
                             }
+                            break;
+                        case 5:
+                            sidebarJump(new ReportFragment(),
+                                    "report");
                             break;
                     }
                     initDrawerHandle();
                 } else if (JumpType.equals("detail") && DetailID != -1) {
-                    FragmentManager fm = getSupportFragmentManager();
-                    if (fm.getBackStackEntryCount() >= 2) {
-                        replaceFragment(ServiceDetailFragment.newInstance(DetailID),
-                                "detail_" + DetailID, true);
-                    } else {
-                        addFragment(ServiceDetailFragment.newInstance(DetailID),
-                                "detail_" + DetailID, true);
-                    }
+                    sidebarJump(ServiceDetailFragment.newInstance(DetailID), "detail_" + DetailID);
                     initDrawerHandle();
                 } else if (JumpType.equals("home")) {
                     toHome("home", 0);
                     initDrawerHandle();
                 } else if (JumpType.equals("promotion")) {
-                    FragmentManager fm = getSupportFragmentManager();
-                    if (fm.getBackStackEntryCount() >= 2) {
-                        replaceFragment(PromotionFragment2.newInstance(DetailID),
-                                "promotion_" + DetailID, true);
-                    } else {
-                        addFragment(PromotionFragment2.newInstance(DetailID),
-                                "promotion_" + DetailID, true);
-                    }
+                    sidebarJump(PromotionFragment2.newInstance(DetailID), "promotion_" + DetailID);
                     initDrawerHandle();
                 }
             }
         });
+    }
+
+    private void sidebarJump(Fragment f, String tag) {
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.getBackStackEntryCount() >= 2) {
+            replaceFragment(f, tag, true);
+        } else {
+            addFragment(f, tag, true);
+        }
     }
 
     private void showLogoutDialog() {
@@ -478,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements
                         String param = "username=" + bookName.getText().toString() + "&phone=" + bookPhone.getText().toString()
                                 + "&sex=" + sexStr + "&service=" + serviceStr
                                 + "&action=booking" + debug;
-                        new JSONResponse(MainActivity.this, BOOKING_URL, param, new JSONResponse.onComplete() {
+                        new JSONResponse(MainActivity.this, API.API_BOOKING, param, new JSONResponse.onComplete() {
                             @Override
                             public void onComplete(JSONObject json) {
                                 try {
@@ -524,7 +524,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void loadDrawerMenu() {
-        new JSONResponse(MainActivity.this, SERVICE_URL, "after=20181230", new JSONResponse.onComplete() {
+        new JSONResponse(MainActivity.this, API.API_GET_SERVICES, "after=20181230", new JSONResponse.onComplete() {
             @Override
             public void onComplete(JSONObject json) {
                 if (!json.isNull("data")) {
@@ -554,28 +554,30 @@ public class MainActivity extends AppCompatActivity implements
                     }
                     group = new ArrayList<MenuBean>();
                     child = new ArrayList<List<ServicesBean>>();
+                    boolean isUserLoggedIn = new User(MainActivity.this).isUserLoggedIn();
+                    if (isUserLoggedIn) {
+                        group.add(new MenuBean("我的檢測報告", 5));
+                    }
                     group.add(new MenuBean("皇牌服務", 0));
                     group.add(new MenuBean("全方位健康管理", 0));
                     group.add(new MenuBean("Promotion", 3));
                     group.add(new MenuBean("關於Young+", 1));
                     group.add(new MenuBean("聯絡Young+", 2));
 
-                    // test
-//                    group.add(new MenuBean("test-register", 4));
-                    if (!sp.getString("userid", "").equals("")) {
+                    if (isUserLoggedIn) {
                         group.add(new MenuBean("登出", 4));
                     } else {
                         group.add(new MenuBean("登入", 4));
                     }
 
+                    if (isUserLoggedIn) {
+                        child.add(new ArrayList<ServicesBean>());
+                    }
                     child.add(aceServiceList);
                     child.add(healthManagementList);
                     child.add(promotionList);
                     child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
-
-                    // test
-//                    child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
 
                     sidebar_menu.setAdapter(new SidebarExpandableListAdapter(MainActivity.this, group, child));

@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.ormediagroup.youngplus.MainActivity;
 import com.ormediagroup.youngplus.R;
+import com.ormediagroup.youngplus.lau.API;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.lau.ProcessingDialog;
 import com.ormediagroup.youngplus.network.JSONResponse;
@@ -31,7 +32,6 @@ public class RegisterFragment extends BaseFragment {
     private EditText registerName, registerEmail, registerPhone, registerPass, registerPassAgain;
     private Button registerSubmit;
 
-    private String SUBMIT_URL = "http://youngplus.com.hk/app-register/";
     private LinearLayout registerPanel;
     private TextView registerLogin;
 
@@ -63,7 +63,7 @@ public class RegisterFragment extends BaseFragment {
                                     String params = "username=" + registerName.getText().toString()
                                             + "&userpass=" + password + "&useremail=" + registerEmail.getText().toString()
                                             + "&userphone=" + registerPhone.getText().toString();
-                                    new JSONResponse(mActivity, SUBMIT_URL, params, new JSONResponse.onComplete() {
+                                    new JSONResponse(mActivity, API.API_REGISTER, params, new JSONResponse.onComplete() {
                                         @Override
                                         public void onComplete(JSONObject json) {
                                             try {

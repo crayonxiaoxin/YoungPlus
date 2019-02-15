@@ -21,6 +21,7 @@ import com.ormediagroup.youngplus.R;
 import com.ormediagroup.youngplus.adapter.CarouselPagerAdapter;
 import com.ormediagroup.youngplus.bean.BannerBean;
 import com.ormediagroup.youngplus.bean.ServicesBean;
+import com.ormediagroup.youngplus.lau.API;
 import com.ormediagroup.youngplus.lau.CommonHolder;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.loadAndRetry.LoadingAndRetryManager;
@@ -51,7 +52,6 @@ public class HomeFragment extends BaseFragment {
     private MultiViewCommonAdapter<ServicesBean> serviceAdapter;
 
     private final static int HOME_AD_LOOP = 1;
-    private String SERVICE_URL = "http://youngplus.com.hk/app-get-services";
 
     static class myHandler extends Handler {
         private final WeakReference<Activity> mActivity;
@@ -101,7 +101,7 @@ public class HomeFragment extends BaseFragment {
     }
 
     private void initData() {
-        new JSONResponse(mActivity, SERVICE_URL, "", new JSONResponse.onComplete() {
+        new JSONResponse(mActivity, API.API_GET_SERVICES, "", new JSONResponse.onComplete() {
             @Override
             public void onComplete(JSONObject json) {
                 if (!json.isNull("data")) {

@@ -16,8 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ormediagroup.youngplus.R;
+import com.ormediagroup.youngplus.lau.API;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.lau.ProcessingDialog;
+import com.ormediagroup.youngplus.lau.User;
 import com.ormediagroup.youngplus.network.JSONResponse;
 
 import org.json.JSONException;
@@ -32,7 +34,6 @@ public class LoginFragment extends BaseFragment {
     private EditText loginEmail, loginPass;
     private Button loginSubmit;
 
-    private String SUBMIT_URL = "http://youngplus.com.hk/app-login/";
     private SharedPreferences sp;
     private LinearLayout loginPanel;
     private TextView loginRegister;
@@ -48,7 +49,7 @@ public class LoginFragment extends BaseFragment {
     }
 
     private void initData() {
-        sp = mActivity.getSharedPreferences("user_info", Context.MODE_PRIVATE);
+        sp = new User(mActivity).getsp();
         final String token = sp.getString("token", "");
         final ProcessingDialog dialog = new ProcessingDialog(mActivity);
         loginSubmit.setOnClickListener(new View.OnClickListener() {
@@ -58,7 +59,7 @@ public class LoginFragment extends BaseFragment {
                     dialog.loading("登入中...");
                     String params = "username=" + loginEmail.getText().toString() + "&userpass="
                             + loginPass.getText().toString() + "&token=" + token;
-                    new JSONResponse(mActivity, SUBMIT_URL, params, new JSONResponse.onComplete() {
+                    new JSONResponse(mActivity, API.API_LOGIN, params, new JSONResponse.onComplete() {
                         @Override
                         public void onComplete(JSONObject json) {
                             try {

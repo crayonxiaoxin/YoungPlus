@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.ormediagroup.youngplus.R;
+import com.ormediagroup.youngplus.lau.API;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.lau.ServiceWebviewClient;
 import com.ormediagroup.youngplus.loadAndRetry.LoadingAndRetryManager;
@@ -31,7 +32,6 @@ import org.json.JSONObject;
 
 public class ServiceDetailFragment extends BaseFragment {
 
-    private String REQUEST_URL = "http://youngplus.com.hk/app-get-service-detail";
     private String link = "";
     private int flag = 0;
 
@@ -117,7 +117,7 @@ public class ServiceDetailFragment extends BaseFragment {
             } else {
                 param = "";
             }
-            new JSONResponse(mActivity, REQUEST_URL, param, new JSONResponse.onComplete() {
+            new JSONResponse(mActivity, API.API_GET_SERVICE_DETAIL, param, new JSONResponse.onComplete() {
                 @Override
                 public void onComplete(JSONObject json) {
                     if (json.length() > 0) {

@@ -42,7 +42,7 @@ public class CarouselPagerAdapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, final int position) {
         final ImageView imageView = new ImageView(context);
         imageView.setAdjustViewBounds(true);
-        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 //        Transformation transformation = new Transformation() {
 //            @Override
 //            public Bitmap transform(Bitmap source) {

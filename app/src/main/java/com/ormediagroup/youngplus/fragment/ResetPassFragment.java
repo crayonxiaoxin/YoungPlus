@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.ormediagroup.youngplus.R;
+import com.ormediagroup.youngplus.lau.API;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.lau.ProcessingDialog;
 import com.ormediagroup.youngplus.network.JSONResponse;
@@ -30,7 +31,6 @@ public class ResetPassFragment extends BaseFragment {
     private Button resetPassSubmit;
     private TextView resetPassBack;
 
-    private String RESET_URL = "http://youngplus.com.hk/app-reset-pass/";
 
     @Nullable
     @Override
@@ -54,7 +54,7 @@ public class ResetPassFragment extends BaseFragment {
             public void onClick(View v) {
                 if (LauUtil.isEmail(resetPassEmail.getText().toString().trim())) {
                     dialog.loading("正在提交...");
-                    new JSONResponse(mActivity, RESET_URL, "email=" + resetPassEmail.getText().toString().trim(), new JSONResponse.onComplete() {
+                    new JSONResponse(mActivity, API.API_RESET_PASSWORD, "email=" + resetPassEmail.getText().toString().trim(), new JSONResponse.onComplete() {
                         @Override
                         public void onComplete(JSONObject json) {
                             try {
