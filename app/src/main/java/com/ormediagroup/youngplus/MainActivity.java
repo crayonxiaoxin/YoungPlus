@@ -13,6 +13,7 @@ import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.media.Image;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -124,8 +125,8 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initView();
+        requestPermissions(); // test
         initData();
-//        requestPermissions(); // test
         if (checkGooglePlayServices()) {
             initFCM();
             receiveIntent();
@@ -133,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void requestPermissions() {
-        requestWhatPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, 1, "您禁用了文件讀寫權限");
+        requestWhatPermission(Manifest.permission.SYSTEM_ALERT_WINDOW, 1, "您禁用了浮動通知權限");
     }
 
     private void requestWhatPermission(String permission, int requestCode, String refusedPrompt) {
@@ -234,11 +235,11 @@ public class MainActivity extends AppCompatActivity implements
         showHomeContent();
         setLogoAction();
         loadDrawerMenu();
-//        initAlarmService();
-//        initFireBaseJobDespatcher();
+        initAlarmService();
+//        initFireBaseJobDispatcher();
     }
 
-    private void initFireBaseJobDespatcher() {
+    private void initFireBaseJobDispatcher() {
         FirebaseJobDispatcher dispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(MainActivity.this));
         Job myJob = dispatcher.newJobBuilder()
                 // the JobService that will be called
@@ -250,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements
                 // don't persist past a device reboot
                 .setLifetime(Lifetime.FOREVER)
                 // start between 0 and 60 seconds from now
-                .setTrigger(Trigger.executionWindow(0, 60))
+                .setTrigger(Trigger.executionWindow(0, 1))
                 // don't overwrite an existing job with the same tag
                 .setReplaceCurrent(false)
                 // retry with exponential backoff
@@ -272,7 +273,15 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initAlarmService() {
-        startService(new Intent(MainActivity.this, AlarmService.class));
+
+//        startService(new Intent(MainActivity.this, AlarmService.class));
+        Context context = MainActivity.this;
+        Intent i = new Intent(context, AlarmService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(i);
+        } else {
+            context.startService(i);
+        }
     }
 
     private void showHomeContent() {
@@ -336,8 +345,7 @@ public class MainActivity extends AppCompatActivity implements
                             }
                             break;
                         case 5:
-                            sidebarJump(new ReportFragment(),
-                                    "report");
+                            sidebarJump(new ReportFragment(), "report");
                             break;
                     }
                     initDrawerHandle();
@@ -737,6 +745,12 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 break;
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        initAlarmService();
     }
 
     private void setDrawerFullScreen() {
