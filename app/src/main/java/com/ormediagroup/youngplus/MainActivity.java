@@ -4,9 +4,11 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -16,6 +18,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -93,7 +96,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements
+public class MainActivity extends BaseActivity implements
         HomeFragment.onHomeFragmentListener,
         ServiceDetailFragment.setOnServiceDetailFragmentListener,
         ServiceWebviewClient.ServiceWebviewListener,
@@ -119,6 +122,18 @@ public class MainActivity extends AppCompatActivity implements
     private EditText bookName, bookPhone;
     private LinearLayout bookNowPart;
     private SharedPreferences sp;
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putString("token", newToken);
                 editor.apply();
+                Log.i(TAG, "onSuccess: sp token = " + sp.getString("token", ""));
             }
         });
 
@@ -273,7 +289,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void initAlarmService() {
-
 //        startService(new Intent(MainActivity.this, AlarmService.class));
         Context context = MainActivity.this;
         Intent i = new Intent(context, AlarmService.class);
@@ -305,6 +320,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
     }
+
 
     private void setDrawerHandle() {
         drawerLayout.addDrawerListener(new DrawerLayout.SimpleDrawerListener() {
@@ -380,7 +396,8 @@ public class MainActivity extends AppCompatActivity implements
                 .setPositiveButton("確定", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        sp.edit().clear().apply();
+                        String token = sp.getString("token", "");
+                        sp.edit().clear().putString("token", token).apply();
                         dialog.dismiss();
                         initData();
                         new ProcessingDialog(MainActivity.this, 1000).success("您已成功登出");
@@ -424,7 +441,7 @@ public class MainActivity extends AppCompatActivity implements
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LauUtil.getScreenWidth(MainActivity.this) - bookNow.getWidth(),
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(-10, 0, 0, 0);
+        lp.setMargins(0, 0, 0, 0);
         bookPanel.setLayoutParams(lp);
         bookNow.bringToFront();
         bookPanel.setFocusable(false);
@@ -704,24 +721,24 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-            View v = getCurrentFocus();
-            if (v instanceof EditText) {
-                Rect outRect = new Rect();
-                v.getGlobalVisibleRect(outRect);
-                if (!outRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
-                    v.clearFocus();
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (imm != null) {
-                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                    }
-                }
-            }
-        }
-        return super.dispatchTouchEvent(ev);
-    }
+//    @Override
+//    public boolean dispatchTouchEvent(MotionEvent ev) {
+//        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+//            View v = getCurrentFocus();
+//            if (v instanceof EditText) {
+//                Rect outRect = new Rect();
+//                v.getGlobalVisibleRect(outRect);
+//                if (!outRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
+//                    v.clearFocus();
+//                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                    if (imm != null) {
+//                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+//                    }
+//                }
+//            }
+//        }
+//        return super.dispatchTouchEvent(ev);
+//    }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -803,33 +820,6 @@ public class MainActivity extends AppCompatActivity implements
         }, hour, minute, true).show();
     }
 
-    private void replaceFragment(Fragment f, String tag, boolean addToBackStack) {
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        Fragment f1 = fm.findFragmentByTag(tag);
-        if (f1 == null) {
-            ft.setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left);
-            ft.replace(R.id.frameLayout, f, tag);
-            if (addToBackStack) {
-                ft.addToBackStack(tag);
-            }
-            ft.commit();
-        } else {
-            fm.popBackStack(tag, 0);
-        }
-    }
-
-    private void addFragment(Fragment f, String tag, boolean addToBackStack) {
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction ft = fm.beginTransaction();
-        ft.setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left);
-        ft.hide(fm.findFragmentById(R.id.frameLayout));
-        ft.add(R.id.frameLayout, f, tag);
-        if (addToBackStack) {
-            ft.addToBackStack(tag);
-        }
-        ft.commit();
-    }
 
     @Override
     public void toDetail(int id) {
@@ -854,6 +844,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void updateLoginStatus() {
         initData();
+        initAlarmService(); // 通知alarm service更新data
     }
 
     @Override

@@ -17,4 +17,6 @@ public class MyApplication extends Application {
         LoadingAndRetryManager.BASE_LOADING_LAYOUT_ID = R.layout.base_loading;
         LoadingAndRetryManager.BASE_RETRY_LAYOUT_ID = R.layout.base_retry;
     }
+
+
 }

@@ -50,13 +50,13 @@ public class LoginFragment extends BaseFragment {
 
     private void initData() {
         sp = new User(mActivity).getsp();
-        final String token = sp.getString("token", "");
         final ProcessingDialog dialog = new ProcessingDialog(mActivity);
         loginSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!LauUtil.isNull(loginEmail) && !LauUtil.isNull(loginPass)) {
                     dialog.loading("登入中...");
+                    final String token = sp.getString("token", "");
                     String params = "username=" + loginEmail.getText().toString() + "&userpass="
                             + loginPass.getText().toString() + "&token=" + token;
                     new JSONResponse(mActivity, API.API_LOGIN, params, new JSONResponse.onComplete() {
@@ -70,6 +70,7 @@ public class LoginFragment extends BaseFragment {
                                     editor.putBoolean("isvip", data.getBoolean("is_vip"));
                                     editor.putString("name", data.getString("display_name"));
                                     editor.putString("email", data.getString("user_email"));
+
                                     editor.apply();
                                     dialog.loadingToSuccess("登入成功").setOnDismissListener(new DialogInterface.OnDismissListener() {
                                         @Override

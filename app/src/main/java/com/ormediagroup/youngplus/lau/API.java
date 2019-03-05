@@ -16,6 +16,7 @@ public class API {
     public static String API_GET_SERVICES = api("app-get-services");
     public static String API_GET_SERVICE_DETAIL = api("app-get-service-detail");
     public static String API_GET_REPORT = api("app-get-report");
+    public static String API_GET_SCHEDULE = api("app-get-schedule");
 
     public static String API_BOOKING = api("app-booking");
 

@@ -19,7 +19,7 @@ public class ScheduleDBOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table if not exists " + this.TABLE_NAME + "(_id integer primary key autoincrement,question text not null,time text not null,used integer not null)");
+        db.execSQL("create table if not exists " + this.TABLE_NAME + "(_id integer primary key autoincrement,userId integer not null,scheduleId integer not null,question text not null,time datetime not null,used integer not null)");
     }
 
     @Override

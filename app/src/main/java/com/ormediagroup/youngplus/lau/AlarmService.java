@@ -48,9 +48,8 @@ public class AlarmService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        sendMsgAboutStartServiceRepeat(30*60*1000);
+        sendMsgAboutStartServiceRepeat(30 * 60 * 1000); // 每30分钟获取一次新数据  or 每天一次？
         getSchedule(); // today schedule
-//        return super.onStartCommand(intent, flags, startId);
         return START_STICKY;
     }
 
@@ -62,67 +61,88 @@ public class AlarmService extends Service {
     // 获取今天的时间表
     private void getSchedule() {
         Log.i(TAG, "getSchedule: ");
-        new JSONResponse(getApplicationContext(), API.API_TEST, "action=1", new JSONResponse.onComplete() {
-            @Override
-            public void onComplete(JSONObject json) {
-                Log.i(TAG, "onComplete: schedule json = " + json);
-                ScheduleDBOpenHelper helper = new ScheduleDBOpenHelper(getApplicationContext());
-                SQLiteDatabase db = helper.getWritableDatabase();
-                if (json.has("data")) {
-                    try {
-                        JSONArray data = json.getJSONArray("data");
-                        for (int i = 0; i < data.length(); i++) {
-                            JSONObject obj = data.getJSONObject(i);
-                            String date = obj.getString("date");
-                            JSONArray schedule = obj.getJSONArray("schedule");
-                            for (int j = 0; j < schedule.length(); j++) {
-                                JSONObject item = schedule.getJSONObject(j);
-                                insert(helper, db, item.getString("task"), date + " " + item.getString("time"));
+        final ScheduleDBOpenHelper helper = new ScheduleDBOpenHelper(getApplicationContext());
+        final SQLiteDatabase db = helper.getWritableDatabase();
+
+        final User user = new User(getApplicationContext());
+        if (user.isUserLoggedIn()) {
+            Log.i(TAG, "getSchedule: logged in");
+            String selection = "userId=" + user.getUserId() + " and (time between '" + getTodayStartTime() + " 00:00:00'" + " and '" + getTodayStartTime() + " 23:59:59')";
+            Log.i(TAG, "getSchedule: selection = " + selection);
+            // 如果当天没有，则请求一次
+            Cursor c = db.query(helper.getTable(), null, selection, null, null, null, null);
+            if (c.getCount() > 0) {
+                int notifyID = 10;
+                while (c.moveToNext()) {
+                    Log.i(TAG, "getSchedule: get");
+
+                    String question = c.getString(c.getColumnIndex("question"));
+                    String time = c.getString(c.getColumnIndex("time"));
+                    Log.i(TAG, "getSchedule: time = " + time);
+                    int scheduleId = c.getInt(c.getColumnIndex("scheduleId"));
+                    int isUsed = c.getInt(c.getColumnIndex("used"));
+                    if (isUsed == 0) {
+                        notifyID++;
+                        Log.i(TAG, "onComplete: notifyID = " + notifyID);
+                        sendAlertSystemMsgToReceiver(scheduleId, "Young+", question, time, notifyID);
+                        update(helper, db, user.getUserId(), scheduleId, question, time);
+                    }
+                }
+            } else {
+                new JSONResponse(getApplicationContext(), API.API_GET_SCHEDULE, "uid=" + user.getUserId() + "&action=get", new JSONResponse.onComplete() {
+                    @Override
+                    public void onComplete(JSONObject json) {
+                        Log.i(TAG, "onComplete: schedule json = " + json);
+                        if (json.has("rc")) {
+                            try {
+                                int rc = json.getInt("rc");
+                                if (rc == 0) {
+                                    JSONArray data = json.getJSONArray("data");
+                                    for (int i = 0; i < data.length(); i++) {
+                                        String sid = data.getJSONObject(i).getString("id");
+                                        String date = data.getJSONObject(i).getString("day");
+                                        String question = data.getJSONObject(i).getString("task");
+                                        String time = data.getJSONObject(i).getString("time");
+                                        insert(helper, db, user.getUserId(), Integer.parseInt(sid), question, date + " " + time);
+                                    }
+                                    if (data.length() > 0) {
+                                        getSchedule();
+                                    }
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
-                }
-                getRealFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-                Cursor c = db.query(helper.getTable(), null, "time between '" + getTodayStartTime() + " 00:00:00 '" + " and '" + getTodayStartTime() + " 23:59:59'", null, null, null, null);
-                if (c.getCount() > 0) {
-                    int index = 10;
-                    while (c.moveToNext()) {
-                        String question = c.getString(c.getColumnIndex("question"));
-                        String time = c.getString(c.getColumnIndex("time"));
-                        int isUsed = c.getInt(c.getColumnIndex("used"));
-                        if (isUsed == 0) {
-                            index++;
-                            Log.i(TAG, "onComplete: notifyID = " + index);
-                            sendTest("Young+", question, time, index);
-                            update(helper, db, question, time);
-                        }
-                    }
-                }
-                c.close();
-                db.close();
-                helper.close();
+                });
             }
-        });
+            c.close();
+        }
     }
 
     // 更新已发送的notification状态
-    private void update(ScheduleDBOpenHelper helper, SQLiteDatabase db, String question, String time) {
+    private void update(ScheduleDBOpenHelper helper, SQLiteDatabase db, String userId, int scheduleId, String question, String time) {
         ContentValues values = new ContentValues();
         values.put("used", 1);
-        db.update(helper.getTable(), values, "question='" + question + "' and time='" + time + "'", null);
+        db.update(helper.getTable(), values, "question='" + question + "' and time='" + time + "'" + " and userId=" + userId + " and scheduleId=" + scheduleId, null);
     }
 
     // 插入每个时间
-    private void insert(ScheduleDBOpenHelper helper, SQLiteDatabase db, String question, String time) {
-        Cursor c = db.query(helper.getTable(), null, "question='" + question + "' and time='" + time + "'", null, null, null, null);
+    private void insert(ScheduleDBOpenHelper helper, SQLiteDatabase db, String userId, int scheduleId, String question, String time) {
+        Cursor c = db.query(helper.getTable(), null, "time='" + time + "'" + "and userId=" + userId + " and scheduleId=" + scheduleId, null, null, null, null);
         if (c.getCount() == 0) {
             ContentValues value = new ContentValues();
+            value.put("userId", Integer.parseInt(userId));
+            value.put("scheduleId", scheduleId);
             value.put("question", question);
             value.put("time", time);
             value.put("used", 0);
             db.insert(helper.getTable(), null, value);
+        } else {
+            ContentValues values = new ContentValues();
+            values.put("question", question);
+            values.put("used", 0);
+            db.update(helper.getTable(), values, "time='" + time + "'" + "and userId=" + userId + " and scheduleId=" + scheduleId, null);
         }
         c.close();
     }
@@ -136,11 +156,12 @@ public class AlarmService extends Service {
 
 
     // 设置notification AlarmManager
-    private void sendMsgTest(String title, String content, long delay, int notifyID) {
+    private void sendMsgForAlertSystem(int scheduleId, String title, String content, long delay, int notifyID) {
         AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
         long triggerAtTime = SystemClock.elapsedRealtime() + delay;
         Intent i = new Intent(this, AlarmReceiver.class);
         i.putExtra("notifyID", notifyID);
+        i.putExtra("scheduleId", scheduleId);
         Log.i(TAG, "sendMsgTest: notifyID = " + notifyID);
         if (!title.equals("") && !content.equals("")) {
             i.putExtra("title", title);
@@ -152,6 +173,7 @@ public class AlarmService extends Service {
         }
     }
 
+    // 计划重启时间
     private void sendMsgAboutStartServiceRepeat(long delay) {
         AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
         long triggerAtTime = SystemClock.elapsedRealtime() + delay;
@@ -163,34 +185,19 @@ public class AlarmService extends Service {
         }
     }
 
-    // 计算时间偏移
-    private void sendTest(String title, String content, String dateTime, int notifyID) {
-
-//        String today = getRealFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-//        String[] nowTimeArr = today.split(" ");
-//
-        long delta = 0;
-//        long goneTime = 0;
-//        long currentTime = 0;
-//        try {
-//            long postTime = getRealFormat("yyyy-MM-dd HH:mm:ss").parse(dateTime).getTime(); // 传入时间
-//            long todayStartTime = getRealFormat("yyyy-MM-dd").parse(nowTimeArr[0]).getTime(); // 今天0时0分
-//            currentTime = getRealFormat("yyyy-MM-dd HH:mm:ss").parse(today).getTime(); // 当前时间
-//            goneTime = currentTime - todayStartTime; // 今天已过去的时间
-//            delta = postTime - currentTime; // 传入时间与当前时间差
-//            Log.i(TAG, "sendTest: deltaTime = " + delta);
-//            Log.i(TAG, "sendTest: notifyID = " + notifyID);
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-        delta = calculateDelay(dateTime);
+    // 发送message到receiver
+    private void sendAlertSystemMsgToReceiver(int scheduleId, String title, String content, String dateTime, int notifyID) {
+        long delta = calculateDelay(dateTime);
         if (delta >= 0) {
-            sendMsgTest(title, content, delta, notifyID);
-        } else if (delta < 0) {
-            sendMsgTest(title, content, 0, notifyID);
+            sendMsgForAlertSystem(scheduleId, title, content, delta, notifyID);
         }
+        // 处理过期任务
+//        else if (delta < 0) {
+//            sendMsgTest(title, content, 0, notifyID);
+//        }
     }
 
+    // 计算时间偏移
     private long calculateDelay(String dateTime) {
         String today = getRealFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         String[] nowTimeArr = today.split(" ");
@@ -218,5 +225,6 @@ public class AlarmService extends Service {
         format.setTimeZone(TimeZone.getTimeZone("GMT+08:00"));
         return format;
     }
+
 
 }
