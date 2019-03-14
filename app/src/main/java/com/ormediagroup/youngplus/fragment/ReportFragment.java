@@ -7,7 +7,9 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -76,12 +78,18 @@ public class ReportFragment extends BaseFragment {
             new JSONResponse(mActivity, API.API_GET_REPORT, "uid=" + userInfo.getUserId(), new JSONResponse.onComplete() {
                 @Override
                 public void onComplete(JSONObject json) {
-                    loadingAndRetryManager.showContent();
                     try {
                         int rc = json.getInt("rc");
                         if (rc == 0) {
                             String link = json.getString("data");
                             reportDetail.loadUrl(link);
+                            reportDetail.setWebViewClient(new WebViewClient(){
+                                @Override
+                                public void onPageFinished(WebView view, String url) {
+                                    super.onPageFinished(view, url);
+                                    loadingAndRetryManager.showContent();
+                                }
+                            });
                         } else {
                             dialog.warning("沒有報告").setOnDismissListener(new DialogInterface.OnDismissListener() {
                                 @Override
