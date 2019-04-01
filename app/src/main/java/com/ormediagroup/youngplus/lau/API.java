@@ -26,4 +26,6 @@ public class API {
     public static String API_LOGIN = api("app-login");
     public static String API_REGISTER = api("app-register");
     public static String API_RESET_PASSWORD = api("app-reset-pass");
+
+    public static String ACTION_ALARM_ALERT = "com.ormediagroup.youngplus.action.alertsystem";
 }

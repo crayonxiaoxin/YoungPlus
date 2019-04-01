@@ -175,13 +175,57 @@ public class MainActivity extends BaseActivity implements
             String type = intent.getStringExtra("type");
             Log.i(TAG, "receiveIntent: type = " + type);
             switch (type) {
-                case "about":
-                    replaceFragment(new AboutFragment(), "about", true);
+                case "page":
+                    String page = intent.getStringExtra("page");
+                    if (page != null) {
+//                        if (page.equals("about")){
+//                            replaceFragment(new AboutFragment(), "about", true);
+//                        }
+                        switch (page) {
+                            case "about":
+                                replaceFragment(new AboutFragment(), "about", true);
+                                break;
+                            case "login":
+                                replaceFragment(new LoginFragment(), "login", true);
+                                break;
+                            case "register":
+                                replaceFragment(new RegisterFragment(), "register", true);
+                                break;
+                            case "contact":
+                                replaceFragment(new ContactFragment(), "contact", true);
+                                break;
+                            case "product":
+                                String id = intent.getStringExtra("id");
+                                Log.i(TAG, "receiveIntent: id = "+id);
+                                if (id != null) {
+                                    replaceFragment(ServiceDetailFragment.newInstance(Integer.parseInt(id)),"detail_"+id,true);
+                                }
+                                break;
+                            case "promotion":
+                                String promotion_id = intent.getStringExtra("id");
+                                Log.i(TAG, "receiveIntent: id = "+promotion_id);
+                                if (promotion_id != null) {
+                                    replaceFragment(PromotionFragment2.newInstance(Integer.parseInt(promotion_id)),"detail_"+promotion_id,true);
+                                }
+                                break;
+                            case "report":
+                                replaceFragment(new ReportFragment(), "report", true);
+                                break;
+                        }
+                    }
                     break;
                 case "link":
+                    Log.i(TAG, "receiveIntent: link = " + intent.getStringExtra("link"));
                     Uri uri = Uri.parse(LauUtil.getLegalURL(intent.getStringExtra("link")));
                     startActivity(new Intent(Intent.ACTION_VIEW, uri));
                     break;
+//                case "alert":
+//                    String alert_title = intent.getStringExtra("title");
+//                    String alert_content = intent.getStringExtra("content");
+//                    if (alert_title!=null&&alert_content!=null){
+//                        Toast.makeText(this,alert_title+alert_content,Toast.LENGTH_SHORT).show();
+//                    }
+//                    break;
             }
         }
 
@@ -251,7 +295,7 @@ public class MainActivity extends BaseActivity implements
         showHomeContent();
         setLogoAction();
         loadDrawerMenu();
-        initAlarmService();
+//        initAlarmService();
 //        initFireBaseJobDispatcher();
     }
 
@@ -581,7 +625,7 @@ public class MainActivity extends BaseActivity implements
                     child = new ArrayList<List<ServicesBean>>();
                     boolean isUserLoggedIn = new User(MainActivity.this).isUserLoggedIn();
                     if (isUserLoggedIn) {
-                        group.add(new MenuBean("我的檢測報告", 5));
+                        group.add(new MenuBean("檢測報告", 5));
                     }
                     group.add(new MenuBean("皇牌服務", 0));
                     group.add(new MenuBean("全方位健康管理", 0));
@@ -767,7 +811,7 @@ public class MainActivity extends BaseActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        initAlarmService();
+//        initAlarmService();
     }
 
     private void setDrawerFullScreen() {
@@ -844,7 +888,7 @@ public class MainActivity extends BaseActivity implements
     @Override
     public void updateLoginStatus() {
         initData();
-        initAlarmService(); // 通知alarm service更新data
+//        initAlarmService(); // 通知alarm service更新data
     }
 
     @Override

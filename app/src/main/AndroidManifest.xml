@@ -26,16 +26,17 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".google.MyFirebaseMessagingService"
+        <service
+            android:name=".google.MyFirebaseMessagingService"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
-        <service
-            android:name=".lau.AlarmService"
-            android:enabled="true" />
+        <!--<service-->
+        <!--android:name=".lau.AlarmService"-->
+        <!--android:enabled="true" />-->
         <!--<service-->
         <!--android:name=".lau.MyJobService"-->
         <!--android:exported="false">-->
@@ -47,10 +48,21 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/young_icon_192x192" />
 
-        <receiver android:name=".lau.AlarmReceiver"></receiver>
+        <receiver
+            android:name=".lau.AlarmReceiver"
+            android:enabled="true"
+            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
+        </receiver>
 
-        <activity android:name=".LoginActivity"></activity>
+        <activity android:name=".LoginActivity" />
     </application>
 
 </manifest>
