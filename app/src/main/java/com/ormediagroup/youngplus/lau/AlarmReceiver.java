@@ -1,11 +1,13 @@
 package com.ormediagroup.youngplus.lau;
 
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.media.RingtoneManager;
@@ -37,7 +39,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, Intent intent) {
         // 注意requestCode一定要不同，否则获取不到正确的bundle
         Bundle bundle = intent.getExtras();
-        Log.i(TAG, "onReceive: action = "+intent.getAction());
+        Log.i(TAG, "onReceive: action = " + intent.getAction());
         if (bundle != null) {
             Log.i(TAG, "onReceive: bundle = " + bundle.toString());
             String action = intent.getAction();
@@ -45,13 +47,13 @@ public class AlarmReceiver extends BroadcastReceiver {
                 if (action.equals("com.ormediagroup.youngplus.action.alertsystem")) {
                     sendNotification(context, bundle.getString("title"), bundle.getString("content"), bundle.getInt("notifyID"), null);
                 }
-//                else if (action.equals("com.ormediagroup.youngplus.action.alerttoast")) {
-//                    String alert_title = intent.getStringExtra("title");
-//                    String alert_content = intent.getStringExtra("content");
-//                    if (alert_title != null && alert_content != null) {
-//                        Toast.makeText(context, alert_title + "\n" + alert_content, Toast.LENGTH_SHORT).show();
-//                    }
-//                }
+                else if (action.equals("com.ormediagroup.youngplus.action.alerttoast")) {
+                    String alert_title = intent.getStringExtra("title");
+                    String alert_content = intent.getStringExtra("content");
+                    if (alert_title != null && alert_content != null) {
+                        Toast.makeText(context, alert_title + "\n" + alert_content, Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
 
 //            if (bundle.getString("title") != null && bundle.getString("content") != null && bundle.getInt("notifyID", 0) > 0 && bundle.getInt("scheduleId", 0) > 0) {
@@ -164,17 +166,23 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 
     // 获取PendingIntent
-    private PendingIntent getPendingIntentForAlertSystem2(Context context, String title, String content,  int notifyID) {
-//        Intent intent = new Intent(context, AlarmReceiver.class);
+    private PendingIntent getPendingIntentForAlertSystem2(Context context, String title, String content, int notifyID) {
         Intent intent = new Intent(context,MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        intent.setAction("com.ormediagroup.youngplus.action.alerttoast");
         intent.putExtra("type","alert");
         intent.putExtra("title", title);
         intent.putExtra("content", content);
         Log.i(TAG, "getPendingIntent: notifyID = " + notifyID);
-//        return PendingIntent.getBroadcast(context, notifyID, intent, flags);
         return PendingIntent.getActivity(context, notifyID, intent, PendingIntent.FLAG_ONE_SHOT);
+
+//        Intent intent = new Intent(context, AlarmReceiver.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        intent.setAction("com.ormediagroup.youngplus.action.alerttoast");
+//        intent.putExtra("type", "alert");
+//        intent.putExtra("title", title);
+//        intent.putExtra("content", content);
+//        Log.i(TAG, "getPendingIntent: notifyID = " + notifyID);
+//        return PendingIntent.getBroadcast(context, notifyID, intent, PendingIntent.FLAG_ONE_SHOT);
     }
 
     private void sendNotification(Context context, String title, String messageBody, int notifyId, Map<String, String> extra) {

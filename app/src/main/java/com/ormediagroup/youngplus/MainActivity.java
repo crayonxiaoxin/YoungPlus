@@ -214,6 +214,7 @@ public class MainActivity extends BaseActivity implements
                     String alert_content = intent.getStringExtra("content");
                     Log.i(TAG, "receiveIntent: title = " + alert_title);
                     if (alert_title != null && alert_content != null) {
+                        alert_content = alert_content.replace(",","\n");
                         new AlertDialog.Builder(MainActivity.this)
                                 .setIcon(R.mipmap.ic_youngplus)
                                 .setTitle(alert_title)
