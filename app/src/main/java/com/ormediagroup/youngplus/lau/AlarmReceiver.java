@@ -44,19 +44,12 @@ public class AlarmReceiver extends BroadcastReceiver {
             if (action != null) {
                 if (action.equals("com.ormediagroup.youngplus.action.alertsystem")) {
                     sendNotification(context, bundle.getString("title"), bundle.getString("content"), bundle.getInt("notifyID"), null);
-                } else if (action.equals("com.ormediagroup.youngplus.action.alerttoast")) {
-                    String alert_title = intent.getStringExtra("title");
-                    String alert_content = intent.getStringExtra("content");
-                    if (alert_title != null && alert_content != null) {
-                        Toast.makeText(context, alert_title + "\n" + alert_content, Toast.LENGTH_SHORT).show();
-                    }
                 }
-//                else if (action.equals("com.ormediagroup.youngplus.action.link")) {
-//                    String link = bundle.getString("link");
-//                    Log.i(TAG, "onReceive: bundle link = "+link);
-//                    if (link!=null){
-//                        Uri uri = Uri.parse(LauUtil.getLegalURL(link));
-//                        context.startActivity(new Intent(Intent.ACTION_VIEW, uri));
+//                else if (action.equals("com.ormediagroup.youngplus.action.alerttoast")) {
+//                    String alert_title = intent.getStringExtra("title");
+//                    String alert_content = intent.getStringExtra("content");
+//                    if (alert_title != null && alert_content != null) {
+//                        Toast.makeText(context, alert_title + "\n" + alert_content, Toast.LENGTH_SHORT).show();
 //                    }
 //                }
             }
@@ -171,21 +164,22 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 
     // 获取PendingIntent
-    private PendingIntent getPendingIntentForAlertSystem2(Context context, String title, String content, int flags, int notifyID) {
-        Intent intent = new Intent(context, AlarmReceiver.class);
+    private PendingIntent getPendingIntentForAlertSystem2(Context context, String title, String content,  int notifyID) {
+//        Intent intent = new Intent(context, AlarmReceiver.class);
+        Intent intent = new Intent(context,MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        intent.putExtra("type","alert");
-        intent.setAction("com.ormediagroup.youngplus.action.alerttoast");
-//        intent.putExtra("notifyID", notifyID);
+//        intent.setAction("com.ormediagroup.youngplus.action.alerttoast");
+        intent.putExtra("type","alert");
         intent.putExtra("title", title);
         intent.putExtra("content", content);
         Log.i(TAG, "getPendingIntent: notifyID = " + notifyID);
-        return PendingIntent.getBroadcast(context, notifyID, intent, flags);
+//        return PendingIntent.getBroadcast(context, notifyID, intent, flags);
+        return PendingIntent.getActivity(context, notifyID, intent, PendingIntent.FLAG_ONE_SHOT);
     }
 
     private void sendNotification(Context context, String title, String messageBody, int notifyId, Map<String, String> extra) {
 
-        PendingIntent pendingIntent = getPendingIntentForAlertSystem2(context, title, messageBody, 0, notifyId);
+        PendingIntent pendingIntent = getPendingIntentForAlertSystem2(context, title, messageBody, notifyId);
 
         String channelId = context.getString(R.string.default_notification_channel_id);
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
@@ -210,7 +204,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         if (notificationManager != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel channel = new NotificationChannel(channelId,
-                        "Channel human readable title",
+                        "Young+ Alarm",
                         NotificationManager.IMPORTANCE_DEFAULT);
                 notificationManager.createNotificationChannel(channel);
             }

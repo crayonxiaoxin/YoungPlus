@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
@@ -82,6 +83,8 @@ public class ReportFragment extends BaseFragment {
                         int rc = json.getInt("rc");
                         if (rc == 0) {
                             String link = json.getString("data");
+                            WebSettings settings = reportDetail.getSettings();
+                            settings.setJavaScriptEnabled(true);
                             reportDetail.loadUrl(link);
                             reportDetail.setWebViewClient(new WebViewClient(){
                                 @Override

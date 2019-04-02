@@ -31,6 +31,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -123,18 +124,6 @@ public class MainActivity extends BaseActivity implements
     private LinearLayout bookNowPart;
     private SharedPreferences sp;
 
-    private ServiceConnection mConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -171,6 +160,7 @@ public class MainActivity extends BaseActivity implements
      */
     private void receiveIntent() {
         Intent intent = getIntent();
+        Log.i(TAG, "receiveIntent: intent = " + intent);
         if (intent.hasExtra("type")) {
             String type = intent.getStringExtra("type");
             Log.i(TAG, "receiveIntent: type = " + type);
@@ -178,9 +168,6 @@ public class MainActivity extends BaseActivity implements
                 case "page":
                     String page = intent.getStringExtra("page");
                     if (page != null) {
-//                        if (page.equals("about")){
-//                            replaceFragment(new AboutFragment(), "about", true);
-//                        }
                         switch (page) {
                             case "about":
                                 replaceFragment(new AboutFragment(), "about", true);
@@ -196,16 +183,16 @@ public class MainActivity extends BaseActivity implements
                                 break;
                             case "product":
                                 String id = intent.getStringExtra("id");
-                                Log.i(TAG, "receiveIntent: id = "+id);
+                                Log.i(TAG, "receiveIntent: id = " + id);
                                 if (id != null) {
-                                    replaceFragment(ServiceDetailFragment.newInstance(Integer.parseInt(id)),"detail_"+id,true);
+                                    replaceFragment(ServiceDetailFragment.newInstance(Integer.parseInt(id)), "detail_" + id, true);
                                 }
                                 break;
                             case "promotion":
                                 String promotion_id = intent.getStringExtra("id");
-                                Log.i(TAG, "receiveIntent: id = "+promotion_id);
+                                Log.i(TAG, "receiveIntent: id = " + promotion_id);
                                 if (promotion_id != null) {
-                                    replaceFragment(PromotionFragment2.newInstance(Integer.parseInt(promotion_id)),"detail_"+promotion_id,true);
+                                    replaceFragment(PromotionFragment2.newInstance(Integer.parseInt(promotion_id)), "detail_" + promotion_id, true);
                                 }
                                 break;
                             case "report":
@@ -215,17 +202,30 @@ public class MainActivity extends BaseActivity implements
                     }
                     break;
                 case "link":
-                    Log.i(TAG, "receiveIntent: link = " + intent.getStringExtra("link"));
-                    Uri uri = Uri.parse(LauUtil.getLegalURL(intent.getStringExtra("link")));
-                    startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    String link = intent.getStringExtra("link");
+                    if (link != null) {
+                        Log.i(TAG, "receiveIntent: link = " + link);
+                        Uri uri = Uri.parse(LauUtil.getLegalURL(intent.getStringExtra("link")));
+                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    }
                     break;
-//                case "alert":
-//                    String alert_title = intent.getStringExtra("title");
-//                    String alert_content = intent.getStringExtra("content");
-//                    if (alert_title!=null&&alert_content!=null){
-//                        Toast.makeText(this,alert_title+alert_content,Toast.LENGTH_SHORT).show();
-//                    }
-//                    break;
+                case "alert":
+                    String alert_title = intent.getStringExtra("title");
+                    String alert_content = intent.getStringExtra("content");
+                    Log.i(TAG, "receiveIntent: title = " + alert_title);
+                    if (alert_title != null && alert_content != null) {
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setIcon(R.mipmap.ic_youngplus)
+                                .setTitle(alert_title)
+                                .setMessage(alert_content)
+                                .setPositiveButton("確定", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                }).show();
+                    }
+
             }
         }
 
