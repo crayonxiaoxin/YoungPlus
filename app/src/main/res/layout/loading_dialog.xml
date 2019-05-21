@@ -8,13 +8,13 @@
 
     <LinearLayout
         android:id="@+id/replace_part"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:orientation="vertical">
 
         <ProgressBar
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:indeterminateDrawable="@drawable/shape_progressbar" />
     </LinearLayout>
 

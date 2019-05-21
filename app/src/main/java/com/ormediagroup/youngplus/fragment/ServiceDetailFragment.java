@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.ormediagroup.youngplus.R;
@@ -38,8 +39,9 @@ public class ServiceDetailFragment extends BaseFragment {
     private View view;
     private WebView service_detail;
     private LoadingAndRetryManager loadingAndRetryManager;
-    private RelativeLayout parentLayout;
+    private LinearLayout parentLayout;
     private FloatingActionButton shareBtn;
+    private RelativeLayout relativeLayout;
 
     public static ServiceDetailFragment newInstance(int id) {
         ServiceDetailFragment f = new ServiceDetailFragment();
@@ -63,7 +65,6 @@ public class ServiceDetailFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.fragment_service_detail, container, false);
         initView();
-        initData();
         return view;
     }
 
@@ -83,12 +84,15 @@ public class ServiceDetailFragment extends BaseFragment {
             }
         });
         loadingAndRetryManager.showLoading();
+        initData();
     }
 
     private void initView() {
         parentLayout = view.findViewById(R.id.parentLayout);
-        service_detail = new WebView(mActivity);
-        parentLayout.addView(service_detail);
+        relativeLayout = view.findViewById(R.id.relativeLayout);
+//        service_detail = new WebView(mActivity);
+//        relativeLayout.addView(service_detail);
+        service_detail = view.findViewById(R.id.webView);
         shareBtn = new FloatingActionButton(mActivity);
         RelativeLayout.LayoutParams shareBtnParams =
                 new RelativeLayout.LayoutParams(LauUtil.dip2px(mActivity, 60), LauUtil.dip2px(mActivity, 60));
@@ -99,13 +103,11 @@ public class ServiceDetailFragment extends BaseFragment {
         shareBtn.setImageResource(R.drawable.icon_share_white);
         shareBtn.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#754c24")));
         shareBtn.setScaleType(ImageView.ScaleType.CENTER);
-        parentLayout.addView(shareBtn);
+        relativeLayout.addView(shareBtn);
         shareBtn.bringToFront();
     }
 
     private void initData() {
-//        SharedPreferences sp = mActivity.getSharedPreferences("user_info", Context.MODE_PRIVATE);
-//        Toast.makeText(mActivity,"id="+sp.getString("userid",""),Toast.LENGTH_SHORT).show();
         Bundle bundle = getArguments();
         if (bundle != null) {
             String param;
@@ -161,16 +163,16 @@ public class ServiceDetailFragment extends BaseFragment {
         }
     }
 
-    @Override
-    public boolean onBackPressed() {
-        setOnServiceDetailFragmentListener sosdfl = (setOnServiceDetailFragmentListener) mActivity;
-        if (sosdfl != null) {
-            sosdfl.toHome("detail", 0);
-            return true;
-        } else {
-            return super.onBackPressed();
-        }
-    }
+//    @Override
+//    public boolean onBackPressed() {
+//        setOnServiceDetailFragmentListener sosdfl = (setOnServiceDetailFragmentListener) mActivity;
+//        if (sosdfl != null) {
+//            sosdfl.toHome("detail", 0);
+//            return true;
+//        } else {
+//            return super.onBackPressed();
+//        }
+//    }
 
     public interface setOnServiceDetailFragmentListener {
         void toHome(String tag, int flag);

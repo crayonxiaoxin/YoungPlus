@@ -57,8 +57,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        Log.i(TAG, "onTaskRemoved: "+rootIntent);
-        Toast.makeText(this,"onTaskRemoved",Toast.LENGTH_SHORT).show();
+        Log.i(TAG, "onTaskRemoved: " + rootIntent);
+        Toast.makeText(this, "onTaskRemoved", Toast.LENGTH_SHORT).show();
     }
 
     public void onMessageReceived(RemoteMessage remoteMessage) {
@@ -85,7 +85,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 switch (remoteMessage.getData().get("type")) {
                     case "alarm_alert":
                         String[] request_link = remoteMessage.getData().get("api").split("\\?");
-//                        sendAlertSystemMsgToReceiver(10, request_link[0], request_link[1], "2019-03-20 11:10:00", 10);
                         new JSONResponse(this, request_link[0], request_link[1], new JSONResponse.onComplete() {
                             @Override
                             public void onComplete(JSONObject json) {
@@ -106,14 +105,15 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                                         Log.i(TAG, "onComplete: alarm_alert time = " + time);
                                         Log.i(TAG, "onComplete: alarm_alert task = " + task);
                                         String value = obj.getString("value");
-                                        if (value.equals("on")) {
-                                            String[] a = time.split(" ");
-                                            String requestCode = a[0].replace("-", "") + a[1].replace(":", "");
-                                            requestCode = requestCode.substring(2,12);
-                                            int rc = Integer.parseInt(requestCode);
-                                            Log.i(TAG, "onComplete: requestCode = "+rc);
-
-                                            sendAlertSystemMsgToReceiver(title, task, time, rc);
+                                        String[] a = time.split(" ");
+                                        String requestCode = a[0].replace("-", "") + a[1].replace(":", "");
+                                        requestCode = requestCode.substring(2, 12);
+                                        int rc = Integer.parseInt(requestCode);
+                                        Log.i(TAG, "onComplete: requestCode = " + rc);
+                                        long delta = calculateDelay(time);
+                                        boolean enable = value.equals("on");
+                                        if (delta >= 0) {
+                                            sendMsgForAlertSystem(title, task, delta, rc, enable);
                                         }
                                     }
                                 } catch (JSONException e) {
@@ -147,12 +147,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 case "page":
                     // for background, foreground can get this message directly without intent.putExtra()
                     intent.putExtra("type", type);
-                    if (extra.get("page")!=null){
-                        intent.putExtra("page",extra.get("page"));
+                    if (extra.get("page") != null) {
+                        intent.putExtra("page", extra.get("page"));
                     }
-                    if (extra.get("id")!=null){
-                        Log.i(TAG, "sendNotification: payload page id "+extra.get("id"));
-                        intent.putExtra("id",extra.get("id"));
+                    if (extra.get("id") != null) {
+                        Log.i(TAG, "sendNotification: payload page id " + extra.get("id"));
+                        intent.putExtra("id", extra.get("id"));
                     }
                     pendingIntent = PendingIntent.getActivity(this, 0, intent,
                             PendingIntent.FLAG_ONE_SHOT);
@@ -195,8 +195,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .setStyle(bigTextStyle)
                         .setAutoCancel(true)
                         .setSound(defaultSoundUri)
-                        .setContentIntent(pendingIntent)
-                ;
+                        .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -210,7 +209,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 notificationManager.createNotificationChannel(channel);
             }
             notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
-//            startForeground(1,notificationBuilder.build());
         }
     }
 
@@ -225,7 +223,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     // 设置notification AlarmManager
-    private void sendMsgForAlertSystem(String title, String content, long delay, int notifyID) {
+    private void sendMsgForAlertSystem(String title, String content, long delay, int notifyID, boolean enable) {
         AlarmManager manager = (AlarmManager) getSystemService(Service.ALARM_SERVICE);
         long triggerAtTime = SystemClock.elapsedRealtime() + delay;
         Intent i = new Intent(this, AlarmReceiver.class);
@@ -238,20 +236,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         PendingIntent pi = PendingIntent.getBroadcast(this, notifyID, i, PendingIntent.FLAG_ONE_SHOT);
         if (manager != null) {
             manager.cancel(pi);
-            manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+            if (enable) {
+                manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
+            }
         }
-    }
-
-    // 发送message到receiver
-    private void sendAlertSystemMsgToReceiver(String title, String content, String dateTime, int notifyID) {
-        long delta = calculateDelay(dateTime);
-        if (delta >= 0) {
-            sendMsgForAlertSystem(title, content, delta, notifyID);
-        }
-        // 处理过期任务
-//        else if (delta < 0) {
-//            sendMsgTest(title, content, 0, notifyID);
-//        }
     }
 
     // 计算时间偏移

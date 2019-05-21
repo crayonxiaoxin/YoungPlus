@@ -63,7 +63,8 @@ public class LoginFragment extends BaseFragment {
                         @Override
                         public void onComplete(JSONObject json) {
                             try {
-                                if (json.getInt("rc") == 0) {
+                                int rc = json.getInt("rc");
+                                if (rc == 0) {
                                     JSONObject data = json.getJSONObject("data");
                                     SharedPreferences.Editor editor = sp.edit();
                                     editor.putString("userid", data.get("ID").toString());
@@ -76,13 +77,15 @@ public class LoginFragment extends BaseFragment {
                                         @Override
                                         public void onDismiss(DialogInterface dialog) {
                                             LoginFragmentListener lfl = (LoginFragmentListener) mActivity;
-                                            if (lfl!=null){
+                                            if (lfl != null) {
                                                 lfl.updateLoginStatus();
                                             }
 //                                            getFragmentManager().popBackStackImmediate(); // backPressed won't display this fragment
                                         }
                                     });
                                     Log.i(TAG, "onComplete: json = " + json.getJSONObject("data"));
+                                } else if (rc == -2) {
+                                    dialog.loadingToFailed("登入失敗，用戶不存在");
                                 } else {
                                     dialog.loadingToFailed("登入失敗，賬戶或密碼錯誤");
                                 }
@@ -106,7 +109,7 @@ public class LoginFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 LoginFragmentListener lfl = (LoginFragmentListener) mActivity;
-                if (lfl!=null){
+                if (lfl != null) {
                     lfl.toRegister();
                 }
             }
@@ -115,7 +118,7 @@ public class LoginFragment extends BaseFragment {
             @Override
             public void onClick(View v) {
                 LoginFragmentListener lfl = (LoginFragmentListener) mActivity;
-                if (lfl!=null){
+                if (lfl != null) {
                     lfl.toResetPass();
                 }
             }
@@ -131,9 +134,11 @@ public class LoginFragment extends BaseFragment {
         loginResetPass = view.findViewById(R.id.login_reset_pass);
     }
 
-    public interface LoginFragmentListener{
+    public interface LoginFragmentListener {
         void updateLoginStatus();
+
         void toRegister();
+
         void toResetPass();
     }
 

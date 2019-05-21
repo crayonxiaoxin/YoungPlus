@@ -101,7 +101,8 @@ public class MainActivity extends BaseActivity implements
         HomeFragment.onHomeFragmentListener,
         ServiceDetailFragment.setOnServiceDetailFragmentListener,
         ServiceWebviewClient.ServiceWebviewListener,
-        LoginFragment.LoginFragmentListener {
+        LoginFragment.LoginFragmentListener,
+        ReportFragment.ReportFragmentListener {
 
     private String TAG = "ORM";
     //    private String debug = "&to=lau@efortunetech.com";
@@ -170,33 +171,33 @@ public class MainActivity extends BaseActivity implements
                     if (page != null) {
                         switch (page) {
                             case "about":
-                                replaceFragment(new AboutFragment(), "about", true);
+                                addFragment(new AboutFragment(), "about", true);
                                 break;
                             case "login":
-                                replaceFragment(new LoginFragment(), "login", true);
+                                addFragment(new LoginFragment(), "login", true);
                                 break;
                             case "register":
-                                replaceFragment(new RegisterFragment(), "register", true);
+                                addFragment(new RegisterFragment(), "register", true);
                                 break;
                             case "contact":
-                                replaceFragment(new ContactFragment(), "contact", true);
+                                addFragment(new ContactFragment(), "contact", true);
                                 break;
                             case "product":
                                 String id = intent.getStringExtra("id");
                                 Log.i(TAG, "receiveIntent: id = " + id);
                                 if (id != null) {
-                                    replaceFragment(ServiceDetailFragment.newInstance(Integer.parseInt(id)), "detail_" + id, true);
+                                    addFragment(ServiceDetailFragment.newInstance(Integer.parseInt(id)), "detail_" + id, true);
                                 }
                                 break;
                             case "promotion":
                                 String promotion_id = intent.getStringExtra("id");
                                 Log.i(TAG, "receiveIntent: id = " + promotion_id);
                                 if (promotion_id != null) {
-                                    replaceFragment(PromotionFragment2.newInstance(Integer.parseInt(promotion_id)), "detail_" + promotion_id, true);
+                                    addFragment(PromotionFragment2.newInstance(Integer.parseInt(promotion_id)), "detail_" + promotion_id, true);
                                 }
                                 break;
                             case "report":
-                                replaceFragment(new ReportFragment(), "report", true);
+                                addFragment(new ReportFragment(), "report", true);
                                 break;
                         }
                     }
@@ -214,7 +215,7 @@ public class MainActivity extends BaseActivity implements
                     String alert_content = intent.getStringExtra("content");
                     Log.i(TAG, "receiveIntent: title = " + alert_title);
                     if (alert_title != null && alert_content != null) {
-                        alert_content = alert_content.replace(",","\n");
+                        alert_content = alert_content.replace(",", "\n");
                         new AlertDialog.Builder(MainActivity.this)
                                 .setIcon(R.mipmap.ic_youngplus)
                                 .setTitle(alert_title)
@@ -426,11 +427,12 @@ public class MainActivity extends BaseActivity implements
 
     private void sidebarJump(Fragment f, String tag) {
         FragmentManager fm = getSupportFragmentManager();
-        if (fm.getBackStackEntryCount() >= 2) {
-            replaceFragment(f, tag, true);
-        } else {
-            addFragment(f, tag, true);
-        }
+//        if (fm.getBackStackEntryCount() >= 2) {
+//            replaceFragment(f, tag, true);
+//        } else {
+//            addFragment(f, tag, true);
+//        }
+        addFragment(f, tag, true);
     }
 
     private void showLogoutDialog() {
@@ -766,25 +768,6 @@ public class MainActivity extends BaseActivity implements
         }
     }
 
-//    @Override
-//    public boolean dispatchTouchEvent(MotionEvent ev) {
-//        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-//            View v = getCurrentFocus();
-//            if (v instanceof EditText) {
-//                Rect outRect = new Rect();
-//                v.getGlobalVisibleRect(outRect);
-//                if (!outRect.contains((int) ev.getRawX(), (int) ev.getRawY())) {
-//                    v.clearFocus();
-//                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                    if (imm != null) {
-//                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-//                    }
-//                }
-//            }
-//        }
-//        return super.dispatchTouchEvent(ev);
-//    }
-
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -880,10 +863,14 @@ public class MainActivity extends BaseActivity implements
     @Override
     public void toDetailByTitle(String title, String url) {
         if (title.equals("聯絡young")) {
-            replaceFragment(new ContactFragment(), "contact", true);
+            addFragment(new ContactFragment(), "contact", true);
         } else {
-            replaceFragment(ServiceDetailFragment.newInstance(title, url), "detail_" + title, true);
+            addFragment(ServiceDetailFragment.newInstance(title, url), "detail_" + title, true);
         }
+    }
+
+    private void addFragment(Fragment f, String tag, boolean addToBackStack) {
+        addFragment(R.id.frameLayout, f, tag, addToBackStack, false);
     }
 
     @Override
@@ -894,11 +881,16 @@ public class MainActivity extends BaseActivity implements
 
     @Override
     public void toRegister() {
-        replaceFragment(new RegisterFragment(), "register", true);
+        addFragment(new RegisterFragment(), "register", true);
     }
 
     @Override
     public void toResetPass() {
-        replaceFragment(new ResetPassFragment(), "resetPass", true);
+        addFragment(new ResetPassFragment(), "resetPass", true);
+    }
+
+    @Override
+    public void toOpenLink(String url) {
+        addFragment(ReportFragment.newInstance(url), "report_link", true);
     }
 }

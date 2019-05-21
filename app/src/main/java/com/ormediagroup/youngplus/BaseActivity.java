@@ -76,7 +76,8 @@ public class BaseActivity extends AppCompatActivity {
         FragmentTransaction ft = fm.beginTransaction();
         Fragment f1 = fm.findFragmentByTag(tag);
         if (f1 == null) {
-            ft.setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left);
+//            ft.setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left);
+            ft.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
             ft.replace(R.id.frameLayout, f, tag);
             if (addToBackStack) {
                 ft.addToBackStack(tag);
@@ -87,15 +88,58 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    protected void addFragment(Fragment f, String tag, boolean addToBackStack) {
+//    protected void addFragment(Fragment f, String tag, boolean addToBackStack) {
+////        FragmentManager fm = getSupportFragmentManager();
+////
+////        Fragment f1 = fm.findFragmentByTag(tag);
+////        if (f1 == null) {
+////            FragmentTransaction ft = fm.beginTransaction();
+////            ft.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
+//////            ft.hide(fm.findFragmentById(R.id.frameLayout));
+////            ft.add(R.id.frameLayout, f, tag);
+////            if (addToBackStack) {
+////                ft.addToBackStack(tag);
+////            }
+////            ft.commit();
+////        } else {
+////            fm.popBackStack(tag, 0);
+////        }
+//
+//
+//        FragmentManager fm = getSupportFragmentManager();
+//        FragmentTransaction ft = fm.beginTransaction();
+//        Fragment f1 = fm.findFragmentByTag(tag);
+//        ft.setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left);
+////        ft.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
+//        if (f1 == null) {
+//            ft.add(R.id.frameLayout, f, tag);
+//            if (addToBackStack) {
+//                ft.addToBackStack(tag);
+//            }
+//            ft.commit();
+//        } else {
+//            fm.popBackStack(tag, 0);
+//        }
+//
+//    }
+
+    protected void addFragment(int frameLayoutId, Fragment f, String tag, boolean addToBackStack, boolean allowingStateLoss) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        ft.setCustomAnimations(R.anim.in_from_right, R.anim.out_to_left);
-        ft.hide(fm.findFragmentById(R.id.frameLayout));
-        ft.add(R.id.frameLayout, f, tag);
-        if (addToBackStack) {
-            ft.addToBackStack(tag);
+        Fragment f1 = fm.findFragmentByTag(tag);
+        ft.setCustomAnimations(R.anim.enter_from_right, R.anim.exit_to_left, R.anim.enter_from_left, R.anim.exit_to_right);
+        if (f1 == null) {
+            ft.add(frameLayoutId, f, tag);
+            if (addToBackStack) {
+                ft.addToBackStack(tag);
+            }
+            if (allowingStateLoss) {
+                ft.commitAllowingStateLoss();
+            } else {
+                ft.commit();
+            }
+        } else {
+            fm.popBackStack(tag, 0);
         }
-        ft.commit();
     }
 }
