@@ -12,19 +12,25 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -60,6 +66,7 @@ import com.firebase.jobdispatcher.Trigger;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -77,11 +84,12 @@ import com.ormediagroup.youngplus.fragment.RegisterFragment;
 import com.ormediagroup.youngplus.fragment.ReportFragment;
 import com.ormediagroup.youngplus.fragment.ResetPassFragment;
 import com.ormediagroup.youngplus.fragment.ServiceDetailFragment;
+import com.ormediagroup.youngplus.fragment.TestFragment;
+import com.ormediagroup.youngplus.fragment.UserHabitFragment;
 import com.ormediagroup.youngplus.lau.API;
 import com.ormediagroup.youngplus.lau.MyJobService;
 import com.ormediagroup.youngplus.lau.ProcessingDialog;
 import com.ormediagroup.youngplus.lau.User;
-import com.ormediagroup.youngplus.notuse.TestFragment;
 import com.ormediagroup.youngplus.lau.AlarmService;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.lau.ServiceWebviewClient;
@@ -91,9 +99,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -139,20 +151,21 @@ public class MainActivity extends BaseActivity implements
     }
 
     private void requestPermissions() {
-        requestWhatPermission(Manifest.permission.SYSTEM_ALERT_WINDOW, 1, "您禁用了浮動通知權限");
+//        requestWhatPermission(Manifest.permission.SYSTEM_ALERT_WINDOW, 1, "您禁用了浮動通知權限");
+        requestWhatPermission(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.SYSTEM_ALERT_WINDOW, Manifest.permission.CAMERA}, 1001);
     }
 
-    private void requestWhatPermission(String permission, int requestCode, String refusedPrompt) {
-        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission)) {
-                if (refusedPrompt != null) {
-                    Toast.makeText(MainActivity.this, refusedPrompt, Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
-            }
-        }
-    }
+//    private void requestWhatPermission(String permission, int requestCode, String refusedPrompt) {
+//        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, permission)) {
+//                if (refusedPrompt != null) {
+//                    Toast.makeText(MainActivity.this, refusedPrompt, Toast.LENGTH_SHORT).show();
+//                }
+//            } else {
+//                ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
+//            }
+//        }
+//    }
 
     /**
      * Receive foreground & background message
@@ -227,19 +240,20 @@ public class MainActivity extends BaseActivity implements
                                     }
                                 }).show();
                     }
-
             }
         }
-
     }
 
     private void initFCM() {
+        FirebaseApp.initializeApp(this);
+        FirebaseMessaging.getInstance().setAutoInitEnabled(true);
         FirebaseMessaging.getInstance().subscribeToTopic("all");
         FirebaseInstanceId.getInstance().getInstanceId().addOnSuccessListener(MainActivity.this, new OnSuccessListener<InstanceIdResult>() {
             @Override
             public void onSuccess(InstanceIdResult instanceIdResult) {
                 String newToken = instanceIdResult.getToken();
                 Log.i(TAG, "onSuccess: token = " + newToken);
+//                Toast.makeText(MainActivity.this, "token=" + newToken, Toast.LENGTH_SHORT).show();
                 sp = getSharedPreferences("user_info", MODE_PRIVATE);
                 SharedPreferences.Editor editor = sp.edit();
                 editor.putString("token", newToken);
@@ -258,11 +272,12 @@ public class MainActivity extends BaseActivity implements
                 googleApiAvailability.getErrorDialog(this, rc, 0)
                         .show();
             } else {
-                Log.i("ORM", "This device is not supported.");
+                Log.i(TAG, "checkGooglePlayServices: This device is not supported");
                 finish();
             }
             return false;
         } else {
+            Log.i(TAG, "checkGooglePlayServices: success");
             return true;
         }
     }
@@ -398,7 +413,6 @@ public class MainActivity extends BaseActivity implements
                         case 2:
                             sidebarJump(new ContactFragment(), "contact");
                             break;
-
                         case 4:
                             if (new User(MainActivity.this).isUserLoggedIn()) {
                                 showLogoutDialog();
@@ -406,21 +420,24 @@ public class MainActivity extends BaseActivity implements
                                 sidebarJump(new LoginFragment(), "login");
                             }
                             break;
-                        case 5:
-                            sidebarJump(new ReportFragment(), "report");
+                        case 99:
+                            sidebarJump(new UserHabitFragment(), "testing");
                             break;
                     }
-                    initDrawerHandle();
                 } else if (JumpType.equals("detail") && DetailID != -1) {
                     sidebarJump(ServiceDetailFragment.newInstance(DetailID), "detail_" + DetailID);
-                    initDrawerHandle();
                 } else if (JumpType.equals("home")) {
                     toHome("home", 0);
-                    initDrawerHandle();
                 } else if (JumpType.equals("promotion")) {
                     sidebarJump(PromotionFragment2.newInstance(DetailID), "promotion_" + DetailID);
-                    initDrawerHandle();
+                } else if (JumpType.equals("report")) {
+                    if (DetailID == 1) {
+                        sidebarJump(new ReportFragment(), "report");
+                    } else {
+                        sidebarJump(ReportFragment.newInstance(API.API_REPORT_DISEASE_RISK + "?reportaction=show&others=hide&uid=" + new User(MainActivity.this).getUserId()), "report_disease");
+                    }
                 }
+                initDrawerHandle();
             }
         });
     }
@@ -635,6 +652,7 @@ public class MainActivity extends BaseActivity implements
                     group.add(new MenuBean("Promotion", 3));
                     group.add(new MenuBean("關於Young+", 1));
                     group.add(new MenuBean("聯絡Young+", 2));
+                    group.add(new MenuBean("測試", 99));
 
                     if (isUserLoggedIn) {
                         group.add(new MenuBean("登出", 4));
@@ -643,11 +661,15 @@ public class MainActivity extends BaseActivity implements
                     }
 
                     if (isUserLoggedIn) {
-                        child.add(new ArrayList<ServicesBean>());
+                        ArrayList<ServicesBean> reportList = new ArrayList<ServicesBean>();
+                        reportList.add(new ServicesBean(2, "Health Monitoring", 1));
+                        reportList.add(new ServicesBean(2, "疾病風險與建議", 2));
+                        child.add(reportList);
                     }
                     child.add(aceServiceList);
                     child.add(healthManagementList);
                     child.add(promotionList);
+                    child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
@@ -672,6 +694,9 @@ public class MainActivity extends BaseActivity implements
                             switch (child.get(groupPosition).get(childPosition).getType()) {
                                 case 0:
                                     JumpType = "detail";
+                                    break;
+                                case 2:
+                                    JumpType = "report";
                                     break;
                                 case 3:
                                     JumpType = "promotion";
@@ -724,8 +749,55 @@ public class MainActivity extends BaseActivity implements
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == 1) {
-            initData();
+        switch (requestCode) {
+            case 1:
+                if (resultCode == 1) {
+                    initData();
+                }
+                break;
+            case 1001:
+            case 1002:
+            case 1003:
+            case 1004:
+            case 1005:
+                if (resultCode == RESULT_OK) {
+                    getImagePathFromCamera(requestCode);
+                }
+                break;
+            case 2001:
+            case 2002:
+            case 2003:
+            case 2004:
+            case 2005:
+                if (resultCode == RESULT_OK && data != null) {
+                    getImagePathFromGallery(data, requestCode);
+                }
+                break;
+        }
+    }
+
+    private void getImagePathFromCamera(int requestCode) {
+        Intent intent = new Intent(API.ACTION_UPLOAD);
+        intent.putExtra("type", requestCode);
+        LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(intent);
+    }
+
+    private void getImagePathFromGallery(Intent data, int requestCode) {
+        Uri selectImg = data.getData();
+        if (selectImg != null) {
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+            Cursor cursor = getContentResolver().query(selectImg, filePathColumn, null, null, null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                String picturePath = cursor.getString(columnIndex);
+                Log.i(TAG, "onActivityResult: open gallery = " + picturePath);
+                Intent intent = new Intent(API.ACTION_UPLOAD);
+                intent.putExtra("type", requestCode);
+                intent.putExtra("path", picturePath);
+                LocalBroadcastManager.getInstance(getBaseContext()).sendBroadcast(intent);
+                cursor.close();
+            }
         }
     }
 

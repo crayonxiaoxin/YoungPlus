@@ -7,6 +7,11 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:name=".loadAndRetry.MyApplication"
@@ -16,6 +21,7 @@
         android:roundIcon="@mipmap/ic_youngplus_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|screenSize">
@@ -34,19 +40,16 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
-        </service>
-
-        <!--<service-->
-        <!--android:name=".lau.AlarmService"-->
-        <!--android:enabled="true" />-->
-        <!--<service-->
-        <!--android:name=".lau.MyJobService"-->
-        <!--android:exported="false">-->
-        <!--<intent-filter>-->
-        <!--<action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />-->
-        <!--</intent-filter>-->
-        <!--</service>-->
-
+        </service> <!-- <service -->
+        <!-- android:name=".lau.AlarmService" -->
+        <!-- android:enabled="true" /> -->
+        <!-- <service -->
+        <!-- android:name=".lau.MyJobService" -->
+        <!-- android:exported="false"> -->
+        <!-- <intent-filter> -->
+        <!-- <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" /> -->
+        <!-- </intent-filter> -->
+        <!-- </service> -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/default_notification_channel_id" />
@@ -60,11 +63,22 @@
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </receiver>
 
         <activity android:name=".LoginActivity" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.ormediagroup.FileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
     </application>
 
 </manifest>

@@ -212,7 +212,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         if (notificationManager != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel channel = new NotificationChannel(channelId,
-                        "Young+ Alarm",
+                        channelId,
                         NotificationManager.IMPORTANCE_DEFAULT);
                 notificationManager.createNotificationChannel(channel);
             }

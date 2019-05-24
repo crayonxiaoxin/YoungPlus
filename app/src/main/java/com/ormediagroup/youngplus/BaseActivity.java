@@ -1,9 +1,11 @@
 package com.ormediagroup.youngplus;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -141,5 +143,9 @@ public class BaseActivity extends AppCompatActivity {
         } else {
             fm.popBackStack(tag, 0);
         }
+    }
+
+    public void requestWhatPermission(Activity context, String[] permissions, int requestCode) {
+        ActivityCompat.requestPermissions(context, permissions, requestCode);
     }
 }

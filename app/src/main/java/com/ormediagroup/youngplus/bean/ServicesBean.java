@@ -11,8 +11,10 @@ public class ServicesBean extends BaseBean {
     private String img;
     private int detailID;
 
-    public ServicesBean(int type) {
+    public ServicesBean(int type, String title, int detailID) {
         super(type);
+        this.title = title;
+        this.detailID = detailID;
     }
 
     public ServicesBean(int type, int ID, String title, String img, int detailID) {

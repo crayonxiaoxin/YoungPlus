@@ -204,8 +204,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         if (notificationManager != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 NotificationChannel channel = new NotificationChannel(channelId,
-                        "Young+推送",
+                        channelId,
                         NotificationManager.IMPORTANCE_DEFAULT);
+                channel.setDescription("Young+推送");
                 notificationManager.createNotificationChannel(channel);
             }
             notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());

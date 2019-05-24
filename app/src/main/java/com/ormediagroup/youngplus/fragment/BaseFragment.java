@@ -12,6 +12,8 @@ import android.widget.AdapterView;
 
 import com.ormediagroup.youngplus.R;
 
+import java.util.Map;
+
 /**
  * Created by Lau on 2018/11/23.
  */
@@ -55,6 +57,23 @@ public class BaseFragment extends Fragment {
                 unbindDrawables(((ViewGroup) view).getChildAt(i));
             }
             ((ViewGroup) view).removeAllViews();
+        }
+    }
+
+    public String getFullUrl(String url, Map<String, String> params) {
+        if (params != null && params.size() > 0) {
+            StringBuilder link = new StringBuilder(url + "?");
+            int index = 0;
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                link.append(entry.getKey()).append("=").append(entry.getValue());
+                if (index < params.size() - 1) {
+                    link.append("&");
+                    index++;
+                }
+            }
+            return link.toString();
+        } else {
+            return url;
         }
     }
 
