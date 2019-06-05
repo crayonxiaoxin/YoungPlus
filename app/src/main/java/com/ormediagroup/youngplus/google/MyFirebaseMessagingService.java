@@ -39,6 +39,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Lau on 2018/12/5.
@@ -122,11 +124,63 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                             }
                         });
                         break;
+                    case "nutrition":
+                        String[] request_link1 = remoteMessage.getData().get("api").split("\\?");
+                        Log.i(TAG, "onMessageReceived: " + request_link1);
+                        new JSONResponse(this, request_link1[0], request_link1[1], new JSONResponse.onComplete() {
+                            @Override
+                            public void onComplete(JSONObject json) {
+                                Log.i(TAG, "onComplete: json = " + json);
+                                try {
+                                    int rc = json.getInt("rc");
+                                    if (rc == 0) {
+                                        JSONArray data = json.getJSONObject("data").getJSONArray("data");
+                                        Log.i(TAG, "onComplete: json data = " + data);
+                                        for (int i = 0; i < data.length(); i++) {
+                                            JSONObject obj = data.getJSONObject(i);
+                                            Log.i(TAG, "onComplete: json data item = " + obj);
+                                            String title = obj.getString("title");
+                                            String time = obj.getString("time");
+                                            String content = "";
+                                            JSONArray food = obj.getJSONArray("food");
+                                            JSONArray quantity = obj.getJSONArray("quantity");
+                                            for (int j = 0; j < food.length(); j++) {
+                                                content += food.getString(j) + " " + quantity.getString(j);
+                                                if (j < food.length() - 1) {
+                                                    content += "，";
+                                                }
+                                            }
+                                            Log.i(TAG, "onComplete: json data content = " + content);
+                                            String today = getRealFormat("yyyy-MM-dd").format(new Date());
+                                            if (time != null && !time.equals("")) {
+                                                long delta = calculateDelay(today + " " + (time.length() < 6 ? time + ":00" : time));
+                                                String requestCode = today.replace("-", "") + i;
+                                                int resC = Integer.parseInt(requestCode);
+                                                if (delta >= 0) {
+                                                    sendMsgForNutrition(title, content, time, delta, resC, i);
+                                                } else {
+                                                    delta = delta + 24 * 60 * 60 * 1000;
+                                                    sendMsgForNutrition(title, content, time, delta, resC, i);
+                                                }
+                                            }
+                                        }
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                        break;
                 }
             }
-
         }
+    }
 
+
+    @Override
+    public void onDeletedMessages() {
+        super.onDeletedMessages();
+        Log.i(TAG, "onDeletedMessages: payload?");
     }
 
     /**
@@ -240,6 +294,25 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             if (enable) {
                 manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
             }
+        }
+    }
+
+    private void sendMsgForNutrition(String title, String content, String time, long delay, int notifyID, int index) {
+        AlarmManager manager = (AlarmManager) getSystemService(Service.ALARM_SERVICE);
+        long triggerAtTime = SystemClock.elapsedRealtime() + delay;
+        Intent i = new Intent(this, AlarmReceiver.class);
+        i.putExtra("notifyID", notifyID);
+        i.setAction("com.ormediagroup.youngplus.action.nutrition");
+        if (!title.equals("") && !content.equals("")) {
+            i.putExtra("title", title);
+            i.putExtra("content", content);
+            i.putExtra("time", time);
+            i.putExtra("index", index);
+        }
+        PendingIntent pi = PendingIntent.getBroadcast(this, notifyID, i, PendingIntent.FLAG_ONE_SHOT);
+        if (manager != null) {
+            manager.cancel(pi);
+            manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
         }
     }
 

@@ -15,7 +15,7 @@
 
     <application
         android:name=".loadAndRetry.MyApplication"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_youngplus"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_youngplus_round"
@@ -27,6 +27,7 @@
             android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -40,7 +41,8 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
-        </service> <!-- <service -->
+        </service>
+        <!-- <service -->
         <!-- android:name=".lau.AlarmService" -->
         <!-- android:enabled="true" /> -->
         <!-- <service -->

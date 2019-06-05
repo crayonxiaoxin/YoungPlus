@@ -48,7 +48,7 @@ public class TestAdapter extends SingleViewCommonAdapter<MenuBean> implements Si
     }
 
     @Override
-    protected void convert(final Context context, final CommonHolder holder, MenuBean menuBean) {
+    protected void convert(final Context context, final CommonHolder holder, MenuBean menuBean,int position) {
         holder.setText(R.id.menu_item,menuBean.getTitle());
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

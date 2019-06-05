@@ -153,7 +153,7 @@ public abstract class SingleViewCommonAdapter<T> extends RecyclerView.Adapter<Re
             }
             CommonHolder commonHolder = (CommonHolder) holder;
             // extend这个adapter时需要实现这个abstract方法进行onBindViewHolder
-            convert(context, commonHolder, list.get(realPosition));
+            convert(context, commonHolder, list.get(realPosition),position);
             // 点击事件
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -193,7 +193,7 @@ public abstract class SingleViewCommonAdapter<T> extends RecyclerView.Adapter<Re
         }
     }
 
-    protected abstract void convert(Context context, CommonHolder holder, T t);
+    protected abstract void convert(Context context, CommonHolder holder, T t,int position);
 
     public interface setOnItemClickListener {
         void onItemClick(int position);

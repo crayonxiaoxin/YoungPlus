@@ -1,6 +1,7 @@
 package com.ormediagroup.youngplus;
 
 import android.Manifest;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
@@ -646,13 +647,13 @@ public class MainActivity extends BaseActivity implements
                     boolean isUserLoggedIn = new User(MainActivity.this).isUserLoggedIn();
                     if (isUserLoggedIn) {
                         group.add(new MenuBean("檢測報告", 5));
+                        group.add(new MenuBean("健康記錄", 99));
                     }
                     group.add(new MenuBean("皇牌服務", 0));
                     group.add(new MenuBean("全方位健康管理", 0));
                     group.add(new MenuBean("Promotion", 3));
                     group.add(new MenuBean("關於Young+", 1));
                     group.add(new MenuBean("聯絡Young+", 2));
-                    group.add(new MenuBean("測試", 99));
 
                     if (isUserLoggedIn) {
                         group.add(new MenuBean("登出", 4));
@@ -665,11 +666,11 @@ public class MainActivity extends BaseActivity implements
                         reportList.add(new ServicesBean(2, "Health Monitoring", 1));
                         reportList.add(new ServicesBean(2, "疾病風險與建議", 2));
                         child.add(reportList);
+                        child.add(new ArrayList<ServicesBean>());
                     }
                     child.add(aceServiceList);
                     child.add(healthManagementList);
                     child.add(promotionList);
-                    child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());

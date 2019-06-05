@@ -5,4 +5,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorActionBar">#FFFFFF</color>
     <color name="styleColor">#754c24</color>
+    <color name="white">#ffffff</color>
+    <color name="gray">#cccccc</color>
 </resources>

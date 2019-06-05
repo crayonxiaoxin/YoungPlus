@@ -12,6 +12,7 @@ public class API {
     }
 
     public static String API_TEST = api("lau-test-2");
+    public static String API_NUTRITION = api("app-nutrition");
 
     public static String API_GET_SERVICES = api("app-get-services");
     public static String API_GET_SERVICE_DETAIL = api("app-get-service-detail");

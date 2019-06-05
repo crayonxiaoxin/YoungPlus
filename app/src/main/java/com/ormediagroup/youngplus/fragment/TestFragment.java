@@ -30,7 +30,7 @@ import android.widget.Toast;
 import com.ormediagroup.youngplus.R;
 import com.ormediagroup.youngplus.lau.API;
 import com.ormediagroup.youngplus.lau.ProcessingDialog;
-import com.ormediagroup.youngplus.network.JSONResponse2;
+import com.ormediagroup.youngplus.network.JSONResponse;
 
 import org.json.JSONObject;
 
@@ -96,7 +96,7 @@ public class TestFragment extends BaseFragment {
                 final ProcessingDialog processingDialog = new ProcessingDialog(mActivity);
                 processingDialog.loading("uploading...");
                 Log.i(TAG, "onClick: test = " + getFullUrl(API.API_TEST, params));
-                new JSONResponse2(mActivity, API.API_TEST, params, fileMap, new JSONResponse2.onComplete() {
+                new JSONResponse(mActivity, API.API_TEST, params, fileMap, new JSONResponse.JSONResponseComplete() {
                     @Override
                     public void onComplete(JSONObject json, boolean netError) {
                         processingDialog.hideLoading();

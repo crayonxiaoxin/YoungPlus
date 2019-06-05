@@ -1,759 +1,423 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f1f1f1"
     android:clickable="true"
     android:focusable="true"
-    android:scrollbars="none">
+    android:orientation="vertical">
 
-    <LinearLayout
+    <ScrollView
+        android:id="@+id/parentLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="15dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            android:text="客戶個人習慣"
-            android:textColor="@color/styleColor"
-            android:textSize="18sp" />
+        android:layout_height="match_parent"
+        android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:paddingLeft="20dp"
+            android:paddingTop="10dp"
+            android:paddingRight="20dp"
+            android:paddingBottom="10dp">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/habit_recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <TextView
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
-                android:text="每天幾點睡覺："
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
-
-            <EditText
-                android:id="@+id/habit_time_sleep"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
-                android:text="每天幾點起床："
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
-
-            <EditText
-                android:id="@+id/habit_time_get_up"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
-                android:text="睡眠質素："
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
-
-            <EditText
-                android:id="@+id/habit_text_quality"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
-                android:text="深睡時間："
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
-
-            <EditText
-                android:id="@+id/habit_text_sleep_hours"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:inputType="number"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="hrs"
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
-                android:text="remarks："
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
-
-            <EditText
-                android:id="@+id/habit_text_sleep_remarks"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="例如: 有沒有發夢, 記不記得夢裡情況"
-                android:minLines="2"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="30dp"
-            android:paddingBottom="10dp"
-            android:text="每天飲食記錄"
-            android:textColor="@color/styleColor"
-            android:textSize="18sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:text="早餐"
-                android:textColor="@color/styleColor" />
-
-            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:text="時間："
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
-
-                <EditText
-                    android:id="@+id/habit_time_breakfast"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:text="食物："
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
-
-                <EditText
-                    android:id="@+id/habit_food_breakfast"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
-
-                <ImageView
-                    android:id="@+id/habit_image_breakfast"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    android:src="@mipmap/ic_launcher" />
-            </LinearLayout>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:text="小食1"
-                android:textColor="@color/styleColor" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:text="時間："
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
-
-                <EditText
-                    android:id="@+id/habit_time_snack1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:text="食物："
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
-
-                <EditText
-                    android:id="@+id/habit_food_snack1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
-
-                <ImageView
-                    android:id="@+id/habit_image_snack1"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    android:src="@mipmap/ic_launcher" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:text="午餐"
-                android:textColor="@color/styleColor" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:text="時間："
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
-
-                <EditText
-                    android:id="@+id/habit_time_lunch"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:text="食物："
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
-
-                <EditText
-                    android:id="@+id/habit_food_lunch"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
-
-                <ImageView
-                    android:id="@+id/habit_image_lunch"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    android:src="@mipmap/ic_launcher" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:text="小食2"
+                android:layout_marginTop="10dp"
+                android:paddingBottom="10dp"
+                android:text="日期"
                 android:textColor="@color/styleColor"
-                android:textSize="14sp" />
+                android:textSize="18sp" />
+
+            <com.ormediagroup.youngplus.lau.SimpleEditText
+                android:id="@+id/habit_today"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:text_width="110dp"
+                app:title="選擇日期：" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:paddingBottom="10dp"
+                android:text="客戶個人習慣"
+                android:textColor="@color/styleColor"
+                android:textSize="18sp" />
+
+            <com.ormediagroup.youngplus.lau.SimpleEditText
+                android:id="@+id/habit_time_sleep"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:text_width="110dp"
+                app:title="每天幾點睡覺：" />
+
+            <com.ormediagroup.youngplus.lau.SimpleEditText
+                android:id="@+id/habit_time_get_up"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:text_width="110dp"
+                app:title="每天幾點起床：" />
+
+            <com.ormediagroup.youngplus.lau.SimpleEditText
+                android:id="@+id/habit_text_quality"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:text_width="110dp"
+                app:title="睡眠質素：" />
+
+            <com.ormediagroup.youngplus.lau.SimpleEditText
+                android:id="@+id/habit_text_sleep_hours"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:input_type="numberDecimal"
+                app:text_width="110dp"
+                app:title="深睡時間(小時)：" />
+
+            <com.ormediagroup.youngplus.lau.SimpleEditText
+                android:id="@+id/habit_text_sleep_remarks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:edit_lines="3"
+                app:hint="例如: 有沒有發夢, 記不記得夢裡情況"
+                app:title="remarks：" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="30dp"
+                android:paddingBottom="10dp"
+                android:text="每天飲食記錄"
+                android:textColor="@color/styleColor"
+                android:textSize="18sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="60dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="時間："
-                    android:textColor="#2c2c2c"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="早餐"
+                    android:textColor="@color/styleColor" />
+
+                <com.ormediagroup.youngplus.lau.SimpleEditText
+                    android:id="@+id/habit_time_breakfast"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="時間：" />
+
+                <com.ormediagroup.youngplus.lau.SimpleEditText
+                    android:id="@+id/habit_food_breakfast"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="食物：" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="52dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="#2c2c2c"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/habit_image_breakfast"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:src="@drawable/add_image" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="小食1"
+                    android:textColor="@color/styleColor" />
+
+                <com.ormediagroup.youngplus.lau.SimpleEditText
+                    android:id="@+id/habit_time_snack1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="時間：" />
+
+                <com.ormediagroup.youngplus.lau.SimpleEditText
+                    android:id="@+id/habit_food_snack1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="食物：" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="52dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="#2c2c2c"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/habit_image_snack1"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:src="@drawable/add_image" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="午餐"
+                    android:textColor="@color/styleColor" />
+
+                <com.ormediagroup.youngplus.lau.SimpleEditText
+                    android:id="@+id/habit_time_lunch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="時間：" />
+
+                <com.ormediagroup.youngplus.lau.SimpleEditText
+                    android:id="@+id/habit_food_lunch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="食物：" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="52dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="#2c2c2c"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/habit_image_lunch"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:src="@drawable/add_image" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="小食2"
+                    android:textColor="@color/styleColor"
                     android:textSize="14sp" />
 
-                <EditText
+                <com.ormediagroup.youngplus.lau.SimpleEditText
                     android:id="@+id/habit_time_snack2"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:textSize="14sp" />
-            </LinearLayout>
+                    app:title="時間：" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:text="食物："
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
-
-                <EditText
+                <com.ormediagroup.youngplus.lau.SimpleEditText
                     android:id="@+id/habit_food_snack2"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="食物：" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:textSize="14sp" />
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="52dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="#2c2c2c"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/habit_image_snack2"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:src="@drawable/add_image" />
+                </LinearLayout>
+
             </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
-
-                <ImageView
-                    android:id="@+id/habit_image_snack2"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    android:src="@mipmap/ic_launcher" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp"
-                android:text="晚餐"
-                android:textColor="@color/styleColor" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_marginBottom="20dp"
+                android:orientation="vertical">
 
                 <TextView
-                    android:layout_width="60dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="時間："
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:text="晚餐"
+                    android:textColor="@color/styleColor" />
 
-                <EditText
+                <com.ormediagroup.youngplus.lau.SimpleEditText
                     android:id="@+id/habit_time_dinner"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="時間：" />
+
+                <com.ormediagroup.youngplus.lau.SimpleEditText
+                    android:id="@+id/habit_food_dinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="食物：" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:textSize="14sp" />
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="52dp"
+                        android:layout_height="wrap_content"
+                        android:textColor="#2c2c2c"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/habit_image_dinner"
+                        android:layout_width="120dp"
+                        android:layout_height="120dp"
+                        android:src="@drawable/add_image" />
+                </LinearLayout>
+
             </LinearLayout>
 
-            <LinearLayout
+            <com.ormediagroup.youngplus.lau.SimpleEditText
+                android:id="@+id/habit_text_water"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                app:input_type="number"
+                app:text_width="60dp"
+                app:title="水(杯)：" />
 
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:text="食物："
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
-
-                <EditText
-                    android:id="@+id/habit_food_dinner"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:maxLines="1"
-                    android:singleLine="true"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="60dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="#2c2c2c"
-                    android:textSize="14sp" />
-
-                <ImageView
-                    android:id="@+id/habit_image_dinner"
-                    android:layout_width="200dp"
-                    android:layout_height="200dp"
-                    android:src="@mipmap/ic_launcher" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="水："
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
-
-            <EditText
-                android:id="@+id/habit_text_water"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textSize="14sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="杯"
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="生果："
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
-
-            <EditText
+            <com.ormediagroup.youngplus.lau.SimpleEditText
                 android:id="@+id/habit_text_fruits"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="30dp"
-            android:paddingBottom="10dp"
-            android:text="運動"
-            android:textColor="@color/styleColor"
-            android:textSize="18sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+                app:text_width="60dp"
+                app:title="生果：" />
 
             <TextView
-                android:layout_width="110dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="運動時間："
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
+                android:paddingTop="30dp"
+                android:paddingBottom="10dp"
+                android:text="運動"
+                android:textColor="@color/styleColor"
+                android:textSize="18sp" />
 
-            <EditText
+            <com.ormediagroup.youngplus.lau.SimpleEditText
                 android:id="@+id/habit_text_sport_hours"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:inputType="number"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textSize="14sp" />
+                app:input_type="numberDecimal"
+                app:text_width="110dp"
+                app:title="運動時間：" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="hrs"
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
-                android:text="做了什麼運動："
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
-
-            <EditText
+            <com.ormediagroup.youngplus.lau.SimpleEditText
                 android:id="@+id/habit_text_sport_type"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="30dp"
-            android:paddingBottom="10dp"
-            android:text="記錄大便情況"
-            android:textColor="@color/styleColor"
-            android:textSize="18sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
+                app:text_width="110dp"
+                app:title="做了什麼運動：" />
 
             <TextView
-                android:layout_width="60dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="次數："
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
+                android:paddingTop="30dp"
+                android:paddingBottom="10dp"
+                android:text="記錄大便情況"
+                android:textColor="@color/styleColor"
+                android:textSize="18sp" />
 
-            <EditText
+            <com.ormediagroup.youngplus.lau.SimpleEditText
                 android:id="@+id/habit_text_stool_times"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:inputType="number"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textSize="14sp" />
-        </LinearLayout>
+                app:input_type="number"
+                app:text_width="60dp"
+                app:title="次數：" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:text="形狀："
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
-
-            <EditText
+            <com.ormediagroup.youngplus.lau.SimpleEditText
                 android:id="@+id/habit_text_stool_shape"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:maxLines="1"
-                android:singleLine="true"
-                android:textSize="14sp" />
-        </LinearLayout>
+                app:text_width="60dp"
+                app:title="形狀：" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
-                android:text="remarks："
-                android:textColor="#2c2c2c"
-                android:textSize="14sp" />
-
-            <EditText
+            <com.ormediagroup.youngplus.lau.SimpleEditText
                 android:id="@+id/habit_text_stool_remarks"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="例如：去得順嗎? 有沒有去不乾淨的感覺? 顏色? 等等"
-                android:minLines="2"
-                android:textSize="14sp" />
-        </LinearLayout>
+                app:edit_lines="3"
+                app:hint="例如：去得順嗎? 有沒有去不乾淨的感覺? 顏色? 等等"
+                app:title="remarks：" />
 
-    </LinearLayout>
-</ScrollView>
+            <Button
+                android:id="@+id/habit_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/botton_140x40"
+                android:text="立即提交"
+                android:textColor="@color/styleColor"
+                android:textSize="18dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</LinearLayout>

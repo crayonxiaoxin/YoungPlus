@@ -34,10 +34,36 @@
         android:textColor="#2c2c2c"
         android:textSize="20sp" />
 
+    <LinearLayout
+        android:id="@+id/icon_remove_part"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:background="#eeeeee" />
+
+        <TextView
+            android:id="@+id/icon_remove"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="15dp"
+            android:paddingBottom="15dp"
+            android:text="移除"
+            android:textColor="#ff0000"
+            android:textSize="20sp" />
+    </LinearLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="10dp"
         android:background="#eeeeee" />
+
 
     <TextView
         android:id="@+id/icon_cancel"
