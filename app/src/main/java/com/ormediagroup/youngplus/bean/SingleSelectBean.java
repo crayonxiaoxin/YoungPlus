@@ -8,6 +8,10 @@ public class SingleSelectBean {
     private String title;
     private String content;
 
+    public SingleSelectBean(String title) {
+        this.title = title;
+    }
+
     public SingleSelectBean(int imageRes, String title, String content) {
         this.imageRes = imageRes;
         this.title = title;

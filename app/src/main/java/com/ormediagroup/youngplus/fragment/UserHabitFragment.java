@@ -53,6 +53,7 @@ import com.ormediagroup.youngplus.bean.DailyMenuBean;
 import com.ormediagroup.youngplus.bean.ImageUploadBean;
 import com.ormediagroup.youngplus.bean.SingleSelectBean;
 import com.ormediagroup.youngplus.lau.API;
+import com.ormediagroup.youngplus.lau.CommonHolder;
 import com.ormediagroup.youngplus.lau.MaxHeightRecyclerView;
 import com.ormediagroup.youngplus.lau.ProcessingDialog;
 import com.ormediagroup.youngplus.lau.SimpleEditText;
@@ -89,6 +90,8 @@ public class UserHabitFragment extends BaseFragment {
     private SimpleEditText timeBreakfast, foodBreakfast, timeSnack1, foodSnack1, timeLunch, foodLunch, timeSnack2, foodSnack2, timeDinner, foodDinner;
     private ImageView imageBreakfast, imageSnack1, imageLunch, imageSnack2, imageDinner;
     private Button btnSubmit;
+    private SimpleEditText selectDate;
+    private RecyclerView dailyMenuRecyclerView;
 
     private LoadingAndRetryManager loadingAndRetryManager;
     private ScrollView parentLayout;
@@ -96,14 +99,14 @@ public class UserHabitFragment extends BaseFragment {
     private final int UPLOAD_MAX_SIZE = 2 * 1024 * 1024;
     private final int THUMBNAIL_MAX_SIZE = 512 * 1024;
     private int STOOL_SELECT_POSITION = -1;
+    private int SLEEP_SELECT_POSITION = -1;
 
     private Map<Integer, File> tmpFileMap = new HashMap<>();
     private Map<String, File> fileMap = new HashMap<>();
     private Map<String, File> cacheFile = new HashMap<>();
     private ImageUploadBean breakfastBean, snack1Bean, lunchBean, snack2Bean, dinnerBean;
     private LocalBroadcastManager broadcastManager;
-    private SimpleEditText selectDate;
-    private RecyclerView dailyMenuRecyclerView;
+
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -140,7 +143,6 @@ public class UserHabitFragment extends BaseFragment {
     }
 
     private void initData() {
-
         dailyMenuRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity, LinearLayoutManager.VERTICAL, false) {
             @Override
             public boolean canScrollVertically() {
@@ -201,7 +203,6 @@ public class UserHabitFragment extends BaseFragment {
         checkExists(s);
 
         addDatePicker(selectDate.getEditText());
-
         addTimePicker(timeSleep.getEditText());
         addTimePicker(timeGetUp.getEditText());
         addTimePicker(timeBreakfast.getEditText());
@@ -216,6 +217,12 @@ public class UserHabitFragment extends BaseFragment {
         snack2Bean = new ImageUploadBean(imageSnack2, "img_snack2", 1004, 2004);
         dinnerBean = new ImageUploadBean(imageDinner, "img_dinner", 1005, 2005);
 
+        textQuality.getEditText().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sleepQuality();
+            }
+        });
         imageBreakfast.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -360,6 +367,7 @@ public class UserHabitFragment extends BaseFragment {
         timeSnack2.getEditText().setFocusable(false);
         timeDinner.getEditText().setFocusable(false);
         textStoolShape.getEditText().setFocusable(false);
+        textQuality.getEditText().setFocusable(false);
 
         dailyMenuRecyclerView = view.findViewById(R.id.habit_recyclerView);
         selectDate = view.findViewById(R.id.habit_today);
@@ -599,6 +607,58 @@ public class UserHabitFragment extends BaseFragment {
                 adapter.setSelectPosition(position);
                 STOOL_SELECT_POSITION = position;
                 textStoolShape.setValue(list.get(position).getTitle());
+                popupWindow.dismiss();
+            }
+        });
+    }
+
+    private void sleepQuality() {
+        final View popup = LayoutInflater.from(mActivity).inflate(R.layout.popup_stool_shape, null, false);
+        MaxHeightRecyclerView popupRecyclerView = popup.findViewById(R.id.recyclerView);
+        popupRecyclerView.setLayoutManager(new LinearLayoutManager(mActivity, LinearLayoutManager.VERTICAL, false));
+        popupRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void onDrawOver(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
+                super.onDrawOver(c, parent, state);
+                int left = parent.getPaddingLeft();
+                int right = parent.getWidth() - parent.getPaddingRight();
+                Drawable divider = ContextCompat.getDrawable(mActivity, R.drawable.sep_line);
+                int childCount = parent.getChildCount();
+                for (int i = 0; i < childCount; i++) {
+                    View child = parent.getChildAt(i);
+                    RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
+                    int top = child.getBottom() + params.bottomMargin;
+                    int bottom = top + 1;
+                    if (divider != null) {
+                        divider.setBounds(left, top, right, bottom);
+                        divider.draw(c);
+                    }
+                }
+            }
+        });
+        final List<SingleSelectBean> list = new ArrayList<>();
+        for (int i = 1; i <= 10; i++) {
+            list.add(new SingleSelectBean(i + "分"));
+        }
+        final SingleSelectAdapter adapter = new SingleSelectAdapter(mActivity, list, R.layout.item_sleep_quality);
+        popupRecyclerView.setAdapter(adapter);
+        final PopupWindow popupWindow = new PopupWindow(popup, ActionBar.LayoutParams.MATCH_PARENT, ActionBar.LayoutParams.WRAP_CONTENT, true);
+        popupWindow.showAtLocation(view, Gravity.BOTTOM, 0, 0);
+        setWindowAlpha(0.4f);
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                setWindowAlpha(1.0f);
+            }
+        });
+        adapter.setSelectPosition(SLEEP_SELECT_POSITION >= 0 ? SLEEP_SELECT_POSITION : 0);
+        popupRecyclerView.scrollToPosition(SLEEP_SELECT_POSITION >= 0 ? SLEEP_SELECT_POSITION : 0);
+        adapter.setOnItemClickListener(new SingleViewCommonAdapter.setOnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                adapter.setSelectPosition(position);
+                SLEEP_SELECT_POSITION = position;
+                textQuality.setValue(list.get(position).getTitle());
                 popupWindow.dismiss();
             }
         });

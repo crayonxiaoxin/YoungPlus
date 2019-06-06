@@ -33,6 +33,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -53,27 +54,13 @@ public class AlarmReceiver extends BroadcastReceiver {
             Log.i(TAG, "onReceive: bundle = " + bundle.toString());
             String action = intent.getAction();
             if (action != null) {
-                if (action.equals("com.ormediagroup.youngplus.action.alertsystem")) {
+                if (action.equals(API.ACTION_ALARM_ALERT)) {
                     sendNotification(context, bundle.getString("title"), bundle.getString("content"), bundle.getInt("notifyID"), null);
-                } else if (action.equals("com.ormediagroup.youngplus.action.nutrition")) {
-                    String title = bundle.getString("title", "");
-                    String content = bundle.getString("content", "");
-                    String time = bundle.getString("time", "");
-                    int index = bundle.getInt("index", -1);
-                    int notifyID = bundle.getInt("notifyID", -1);
-                    sendYesOrNoNotification(context, title, content, time, "nutrition", notifyID, 0);
-                    if (!time.equals("")) {
-//                        long delta = 24 * 60 * 60 * 1000;
-                        long delta = 30 * 1000;
-                        Log.i(TAG, "onReceive: deltaTime = " + delta);
-                        Date tomorrow = new Date();
-                        tomorrow.setTime(new Date().getTime() + delta);
-                        String today = getRealFormat("yyyy-MM-dd").format(tomorrow);
-                        String requestCode = today.replace("-", "") + index;
-                        int resC = Integer.parseInt(requestCode);
-                        sendMsgForNutrition(context, title, content, time, delta, resC, index);
-                    }
-                } else if (action.equals("com.ormediagroup.youngplus.action.alerttoast")) {
+                } else if (action.equals(API.ACTION_NUTRITION)) {
+                    sendAndSetNext(context, bundle, API.API_NUTRITION);
+                } else if (action.equals(API.ACTION_CLIENT_ALERT)) {
+                    sendAndSetNext(context, bundle, API.ACTION_CLIENT_ALERT);
+                } else if (action.equals(API.ACTION_ALARM_TOAST)) {
                     String alert_title = intent.getStringExtra("title");
                     String alert_content = intent.getStringExtra("content");
                     if (alert_title != null && alert_content != null) {
@@ -83,90 +70,82 @@ public class AlarmReceiver extends BroadcastReceiver {
             }
 
             String intentType = bundle.getString("type", "");
-            Log.i(TAG, "onReceive: type = " + intentType);
-            Log.i(TAG, "onReceive: what = " + bundle.getInt("what", -1));
-            Log.i(TAG, "onReceive: time = " + bundle.getString("time", ""));
             if (intentType.equals("nutrition")) {
-                int what = bundle.getInt("what", -1);
-                String time = bundle.getString("time", "");
-                Log.i(TAG, "onReceive: what = " + what);
-                if (what == 1) {
-                    NotificationManager notificationManager =
-                            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    if (notificationManager != null) {
-                        notificationManager.cancel("yesorno", bundle.getInt("notifyID"));
-                        // submit
-                        Toast.makeText(context, "what=1 notifyID=" + bundle.getInt("notifyID") + " time=" + time, Toast.LENGTH_SHORT).show();
-                    }
-                } else if (what == 2) {
-                    NotificationManager notificationManager =
-                            (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    if (notificationManager != null) {
-                        notificationManager.cancel("yesorno", bundle.getInt("notifyID"));
-                        // submit
-                        Toast.makeText(context, "what=2 notifyID=" + bundle.getInt("notifyID") + " time=" + time, Toast.LENGTH_SHORT).show();
-                    }
-                }
+                handleYesOrNoClickAction(context, bundle, intentType);
+            } else if (intentType.equals("client_alert")) {
+                handleYesOrNoClickAction(context, bundle, intentType);
             }
-
-
-//            if (bundle.getString("title") != null && bundle.getString("content") != null && bundle.getInt("notifyID", 0) > 0 && bundle.getInt("scheduleId", 0) > 0) {
-//                sendYesOrNoNotification(context, bundle.getString("title"), bundle.getString("content"), bundle.getInt("notifyID"), bundle.getInt("scheduleId"));
-//            } else if (bundle.getInt("what") == 1) {
-//                NotificationManager notificationManager =
-//                        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-//                if (notificationManager != null) {
-//                    notificationManager.cancel("yesorno", bundle.getInt("notifyID"));
-//                    // submit
-//                    int sid = bundle.getInt("scheduleId", 0);
-////                    Toast.makeText(context, "what=1 notifyID=" + bundle.getInt("notifyID") + " scheduleId = " + sid, Toast.LENGTH_SHORT).show();
-//                    if (sid > 0) {
-//                        new JSONResponse(context, API.API_GET_SCHEDULE, "sid=" + sid + "&value=Y&action=save", new JSONResponse.onComplete() {
-//                            @Override
-//                            public void onComplete(JSONObject json) {
-//                                try {
-//                                    if (json.getInt("rc") == 0) {
-//                                        Toast.makeText(context, "提交成功", Toast.LENGTH_SHORT).show();
-//                                    }
-//                                } catch (JSONException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                        });
-//                    }
-//
-//                }
-//            } else if (bundle.getInt("what") == 2) {
-//                NotificationManager notificationManager =
-//                        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-//                if (notificationManager != null) {
-//                    notificationManager.cancel("yesorno", bundle.getInt("notifyID"));
-//                    // submit
-//                    int sid = bundle.getInt("scheduleId", 0);
-////                    Toast.makeText(context, "what=1 notifyID=" + bundle.getInt("notifyID") + " scheduleId = " + sid, Toast.LENGTH_SHORT).show();
-//                    if (sid > 0) {
-//                        new JSONResponse(context, API.API_GET_SCHEDULE, "sid=" + sid + "&value=N&action=save", new JSONResponse.onComplete() {
-//                            @Override
-//                            public void onComplete(JSONObject json) {
-//                                try {
-//                                    if (json.getInt("rc") == 0) {
-//                                        Toast.makeText(context, "提交成功", Toast.LENGTH_SHORT).show();
-//                                    }
-//                                } catch (JSONException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                        });
-//                    }
-//                }
-//            }
         }
-//        Intent i = new Intent(context, AlarmService.class);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            context.startForegroundService(i);
-//        } else {
-//            context.startService(i);
-//        }
+    }
+
+    private void sendAndSetNext(Context context, Bundle bundle, String action) {
+        String title = bundle.getString("title", "");
+        String content = bundle.getString("content", "");
+        String time = bundle.getString("time", "");
+        int index = bundle.getInt("index", -1);
+        int notifyID = bundle.getInt("notifyID", -1);
+        Log.i(TAG, "onReceive: index = " + index);
+        sendYesOrNoNotification(context, title, content, time, "nutrition", notifyID, index);
+        if (!time.equals("")) {
+            long delta = 24 * 60 * 60 * 1000;
+            Log.i(TAG, "onReceive: deltaTime = " + delta);
+            Date tomorrow = new Date();
+            tomorrow.setTime(new Date().getTime() + delta);
+            String today = getRealFormat("yyyy-MM-dd").format(tomorrow);
+            String requestCode = today.replace("-", "") + index;
+            int resC = Integer.parseInt(requestCode);
+            sendMsgFor(context, action, title, content, time, delta, resC, index);
+        }
+    }
+
+    private void handleYesOrNoClickAction(Context context, Bundle bundle, String intentType) {
+        int what = bundle.getInt("what", -1);
+        String time = bundle.getString("time", "");
+        int index = bundle.getInt("scheduleId");
+        Log.i(TAG, "onReceive: type = " + intentType);
+        Log.i(TAG, "onReceive: what = " + what);
+        Log.i(TAG, "onReceive: time = " + time);
+        Log.i(TAG, "onReceive: index = " + index);
+        String today = getRealFormat("yyyy-MM-dd").format(new Date());
+        String uid = new User(context).getUserId();
+        if (what == 1) {
+            NotificationManager notificationManager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.cancel("yesorno", bundle.getInt("notifyID"));
+//                Toast.makeText(context, "uid=" + uid + " what=1 notifyID=" + bundle.getInt("notifyID") + " date=" + today + " time=" + time, Toast.LENGTH_SHORT).show();
+                submitYESorNOFor(context, intentType, uid, today, time, index, what, "", "");
+            }
+        } else if (what == 2) {
+            NotificationManager notificationManager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager != null) {
+                notificationManager.cancel("yesorno", bundle.getInt("notifyID"));
+//                Toast.makeText(context, "what=2 notifyID=" + bundle.getInt("notifyID") + " date=" + today + " time=" + time, Toast.LENGTH_SHORT).show();
+                submitYESorNOFor(context, intentType, uid, today, time, index, what, "", "");
+            }
+        }
+    }
+
+    private void submitYESorNOFor(Context context, String intentType, String uid, String today, String time, int index, int what, String title, String content) {
+        if (new User(context).isUserLoggedIn()) {
+            Map<String, String> params = new HashMap<>();
+            params.put("action", "insert");
+            params.put("type", intentType);
+            params.put("uid", uid);
+            params.put("date", today);
+            params.put("time", time);
+            params.put("value", what + "");
+            params.put("title", title);
+            params.put("content", content);
+            params.put("index", index + "");
+            new JSONResponse(context, API.API_SUBMIT_NOTIFICATION, params, new JSONResponse.JSONResponseComplete() {
+                @Override
+                public void onComplete(JSONObject json, boolean netError) {
+                    Log.i(TAG, "onComplete: alert json = " + json);
+                }
+            });
+        }
     }
 
     private void sendYesOrNoNotification(Context context, String contentTitle, String contentText, String time, String type, int notifyID, int scheduleId) {
@@ -218,6 +197,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         intent.putExtra("what", what);
         intent.putExtra("time", time);
         intent.putExtra("scheduleId", scheduleId);
+        Log.i(TAG, "getPendingIntentForAlertSystem: index = " + scheduleId);
         Log.i(TAG, "getPendingIntent: notifyID = " + notifyID);
         return PendingIntent.getBroadcast(context, notifyID, intent, flags);
     }
@@ -269,12 +249,12 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
     }
 
-    private void sendMsgForNutrition(Context context, String title, String content, String time, long delay, int notifyID, int index) {
+    private void sendMsgFor(Context context, String action, String title, String content, String time, long delay, int notifyID, int index) {
         AlarmManager manager = (AlarmManager) context.getSystemService(Service.ALARM_SERVICE);
         long triggerAtTime = SystemClock.elapsedRealtime() + delay;
         Intent i = new Intent(context, AlarmReceiver.class);
         i.putExtra("notifyID", notifyID);
-        i.setAction("com.ormediagroup.youngplus.action.nutrition");
+        i.setAction(action);
         if (!title.equals("") && !content.equals("")) {
             i.putExtra("title", title);
             i.putExtra("content", content);
@@ -291,7 +271,6 @@ public class AlarmReceiver extends BroadcastReceiver {
     private long calculateDelay(String dateTime) {
         String today = getRealFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
         String[] nowTimeArr = today.split(" ");
-
         long delta = 0;
         long goneTime = 0;
         long currentTime = 0;

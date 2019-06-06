@@ -13,6 +13,7 @@ public class API {
 
     public static String API_TEST = api("lau-test-2");
     public static String API_NUTRITION = api("app-nutrition");
+    public static String API_SUBMIT_NOTIFICATION = api("app-submit-notification");
 
     public static String API_GET_SERVICES = api("app-get-services");
     public static String API_GET_SERVICE_DETAIL = api("app-get-service-detail");
@@ -31,5 +32,8 @@ public class API {
     public static String API_REPORT_DISEASE_RISK = api("disease-risk");
 
     public static String ACTION_ALARM_ALERT = "com.ormediagroup.youngplus.action.alertsystem";
+    public static String ACTION_ALARM_TOAST = "com.ormediagroup.youngplus.action.alerttoast";
     public static String ACTION_UPLOAD = "com.ormediagroup.youngplus.action.UPLOAD";
+    public static String ACTION_NUTRITION = "com.ormediagroup.youngplus.action.nutrition";
+    public static String ACTION_CLIENT_ALERT = "com.ormediagroup.youngplus.action.clientalert";
 }

@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.print.PrinterId;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -24,6 +25,7 @@ import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.ormediagroup.youngplus.MainActivity;
 import com.ormediagroup.youngplus.R;
+import com.ormediagroup.youngplus.lau.API;
 import com.ormediagroup.youngplus.lau.AlarmReceiver;
 import com.ormediagroup.youngplus.lau.LauUtil;
 import com.ormediagroup.youngplus.network.JSONResponse;
@@ -79,6 +81,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
             if (remoteMessage.getData().get("type") != null) {
                 data = remoteMessage.getData();
                 Log.i(TAG, "onMessageReceived: type = " + remoteMessage.getData().get("type"));
+                Log.i(TAG, "onMessageReceived: time = " + remoteMessage.getSentTime());
                 sendNotification(remoteMessage.getNotification().getTitle(), remoteMessage.getNotification().getBody(), data);
             }
         } else {
@@ -152,15 +155,76 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                                             }
                                             Log.i(TAG, "onComplete: json data content = " + content);
                                             String today = getRealFormat("yyyy-MM-dd").format(new Date());
-                                            if (time != null && !time.equals("")) {
+                                            if (time != null && isTime(time) && !title.equals("") && !content.equals(" ")) {
                                                 long delta = calculateDelay(today + " " + (time.length() < 6 ? time + ":00" : time));
                                                 String requestCode = today.replace("-", "") + i;
-                                                int resC = Integer.parseInt(requestCode);
+                                                int resC = Integer.parseInt(requestCode.substring(2));
                                                 if (delta >= 0) {
-                                                    sendMsgForNutrition(title, content, time, delta, resC, i);
+//                                                    sendMsgForNutrition(title, content, time, delta, resC, i);
+                                                    sendMsgFor(API.ACTION_NUTRITION, title, content, time, delta, resC, i);
                                                 } else {
                                                     delta = delta + 24 * 60 * 60 * 1000;
-                                                    sendMsgForNutrition(title, content, time, delta, resC, i);
+                                                    Date tmp = new Date();
+                                                    tmp.setTime(new Date().getTime() + 24 * 60 * 60 * 1000);
+                                                    String tomorrow = getRealFormat("yyyy-MM-dd").format(tmp);
+                                                    requestCode = tomorrow.replace("-", "") + i;
+                                                    resC = Integer.parseInt(requestCode.substring(2));
+//                                                    sendMsgForNutrition(title, content, time, delta, resC, i);
+                                                    sendMsgFor(API.ACTION_NUTRITION, title, content, time, delta, resC, i);
+                                                }
+                                            }
+                                        }
+                                    }
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                        break;
+                    case "client_alert":
+                        String[] request_link2 = remoteMessage.getData().get("api").split("\\?");
+                        Log.i(TAG, "onMessageReceived: " + request_link2);
+                        new JSONResponse(this, request_link2[0], request_link2[1], new JSONResponse.onComplete() {
+                            @Override
+                            public void onComplete(JSONObject json) {
+                                Log.i(TAG, "onComplete: json = " + json);
+                                try {
+                                    int rc = json.getInt("rc");
+                                    if (rc == 0) {
+                                        JSONArray data = json.getJSONObject("data").getJSONArray("data");
+                                        Log.i(TAG, "onComplete: json data = " + data);
+                                        for (int i = 0; i < data.length(); i++) {
+                                            JSONObject obj = data.getJSONObject(i);
+                                            Log.i(TAG, "onComplete: json data item = " + obj);
+                                            String title = obj.getString("title");
+                                            String time = obj.getString("time");
+                                            String content = "";
+                                            JSONArray contentArr = obj.getJSONArray("content");
+                                            for (int j = 0; j < contentArr.length(); j++) {
+                                                content += contentArr.getString(j);
+                                                if (j < contentArr.length() - 1) {
+                                                    content += "，";
+                                                }
+                                            }
+                                            Log.i(TAG, "onComplete: json data content = " + content);
+                                            String today = getRealFormat("yyyy-MM-dd").format(new Date());
+                                            Log.i(TAG, "onComplete: isTime = " + isTime(time));
+                                            if (time != null && isTime(time) && !title.equals("") && !content.equals(" ")) {
+                                                long delta = calculateDelay(today + " " + (time.length() < 6 ? time + ":00" : time));
+                                                String requestCode = today.replace("-", "") + (i + 10);
+                                                int resC = Integer.parseInt(requestCode.substring(2));
+                                                if (delta >= 0) {
+//                                                    sendMsgForClientAlert(title, content, time, delta, resC, i);
+                                                    sendMsgFor(API.ACTION_CLIENT_ALERT, title, content, time, delta, resC, i);
+                                                } else {
+                                                    delta = delta + 24 * 60 * 60 * 1000;
+                                                    Date tmp = new Date();
+                                                    tmp.setTime(new Date().getTime() + 24 * 60 * 60 * 1000);
+                                                    String tomorrow = getRealFormat("yyyy-MM-dd").format(tmp);
+                                                    requestCode = tomorrow.replace("-", "") + (i + 10);
+                                                    resC = Integer.parseInt(requestCode.substring(2));
+//                                                    sendMsgForClientAlert(title, content, time, delta, resC, i);
+                                                    sendMsgFor(API.ACTION_CLIENT_ALERT, title, content, time, delta, resC, i);
                                                 }
                                             }
                                         }
@@ -174,6 +238,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 }
             }
         }
+    }
+
+    private boolean isTime(String str) {
+        Pattern pattern = Pattern.compile("^[0-9]{2}:[0-9]{2}$");
+        Matcher matcher = pattern.matcher(str);
+        return matcher.matches();
     }
 
 
@@ -283,7 +353,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         long triggerAtTime = SystemClock.elapsedRealtime() + delay;
         Intent i = new Intent(this, AlarmReceiver.class);
         i.putExtra("notifyID", notifyID);
-        i.setAction("com.ormediagroup.youngplus.action.alertsystem");
+        i.setAction(API.ACTION_ALARM_ALERT);
         if (!title.equals("") && !content.equals("")) {
             i.putExtra("title", title);
             i.putExtra("content", content);
@@ -297,12 +367,12 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    private void sendMsgForNutrition(String title, String content, String time, long delay, int notifyID, int index) {
+    private void sendMsgFor(String action, String title, String content, String time, long delay, int notifyID, int index) {
         AlarmManager manager = (AlarmManager) getSystemService(Service.ALARM_SERVICE);
         long triggerAtTime = SystemClock.elapsedRealtime() + delay;
         Intent i = new Intent(this, AlarmReceiver.class);
         i.putExtra("notifyID", notifyID);
-        i.setAction("com.ormediagroup.youngplus.action.nutrition");
+        i.setAction(action);
         if (!title.equals("") && !content.equals("")) {
             i.putExtra("title", title);
             i.putExtra("content", content);

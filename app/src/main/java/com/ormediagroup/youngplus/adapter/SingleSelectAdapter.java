@@ -27,7 +27,13 @@ public class SingleSelectAdapter extends SingleViewCommonAdapter<SingleSelectBea
 
     @Override
     protected void convert(Context context, CommonHolder holder, SingleSelectBean singleSelectBean, int position) {
-        holder.setText(R.id.title, singleSelectBean.getTitle()).setText(R.id.content, singleSelectBean.getContent()).setImageResource(R.id.image, singleSelectBean.getImageRes());
+        holder.setText(R.id.title, singleSelectBean.getTitle());
+        if (singleSelectBean.getContent() != null) {
+            holder.setText(R.id.content, singleSelectBean.getContent());
+        }
+        if (singleSelectBean.getImageRes() > 0) {
+            holder.setImageResource(R.id.image, singleSelectBean.getImageRes());
+        }
         ImageView icon = holder.getView(R.id.status);
         if (position == selectPosition) {
             icon.setImageResource(R.drawable.success);
