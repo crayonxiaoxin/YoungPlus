@@ -115,7 +115,8 @@ public class MainActivity extends BaseActivity implements
         ServiceDetailFragment.setOnServiceDetailFragmentListener,
         ServiceWebviewClient.ServiceWebviewListener,
         LoginFragment.LoginFragmentListener,
-        ReportFragment.ReportFragmentListener {
+        ReportFragment.ReportFragmentListener,
+        UserHabitFragment.UserHabitFragmentListener {
 
     private String TAG = "ORM";
     //    private String debug = "&to=lau@efortunetech.com";
@@ -212,6 +213,12 @@ public class MainActivity extends BaseActivity implements
                                 break;
                             case "report":
                                 addFragment(new ReportFragment(), "report", true);
+                                break;
+                            case "disease_risk":
+                                addFragment(ReportFragment.newInstance2("disease_risk"), "report_disease", true);
+                                break;
+                            case "daily_health":
+                                addFragment(new UserHabitFragment(), "daily_health", true);
                                 break;
                         }
                     }
@@ -421,8 +428,11 @@ public class MainActivity extends BaseActivity implements
                                 sidebarJump(new LoginFragment(), "login");
                             }
                             break;
+                        case 6:
+                            sidebarJump(new TestFragment(),"testing");
+                            break;
                         case 99:
-                            sidebarJump(new UserHabitFragment(), "testing");
+                            sidebarJump(new UserHabitFragment(), "daily_health");
                             break;
                     }
                 } else if (JumpType.equals("detail") && DetailID != -1) {
@@ -435,7 +445,8 @@ public class MainActivity extends BaseActivity implements
                     if (DetailID == 1) {
                         sidebarJump(new ReportFragment(), "report");
                     } else {
-                        sidebarJump(ReportFragment.newInstance(API.API_REPORT_DISEASE_RISK + "?reportaction=show&others=hide&uid=" + new User(MainActivity.this).getUserId()), "report_disease");
+//                        sidebarJump(ReportFragment.newInstance(API.API_REPORT_DISEASE_RISK + "?reportaction=show&others=hide&uid=" + new User(MainActivity.this).getUserId()), "report_disease");
+                        sidebarJump(ReportFragment.newInstance2("disease_risk"), "report_disease");
                     }
                 }
                 initDrawerHandle();
@@ -444,12 +455,6 @@ public class MainActivity extends BaseActivity implements
     }
 
     private void sidebarJump(Fragment f, String tag) {
-        FragmentManager fm = getSupportFragmentManager();
-//        if (fm.getBackStackEntryCount() >= 2) {
-//            replaceFragment(f, tag, true);
-//        } else {
-//            addFragment(f, tag, true);
-//        }
         addFragment(f, tag, true);
     }
 
@@ -655,6 +660,8 @@ public class MainActivity extends BaseActivity implements
                     group.add(new MenuBean("關於Young+", 1));
                     group.add(new MenuBean("聯絡Young+", 2));
 
+                    group.add(new MenuBean("Testing",6));//test
+
                     if (isUserLoggedIn) {
                         group.add(new MenuBean("登出", 4));
                     } else {
@@ -674,6 +681,8 @@ public class MainActivity extends BaseActivity implements
                     child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
                     child.add(new ArrayList<ServicesBean>());
+
+                    child.add(new ArrayList<ServicesBean>());//test
 
                     sidebar_menu.setAdapter(new SidebarExpandableListAdapter(MainActivity.this, group, child));
                     sidebar_menu.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {

@@ -2,6 +2,7 @@ package com.ormediagroup.youngplus.network;
 
 import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 
@@ -25,7 +26,7 @@ public class JSONResponse {
         void onComplete(JSONObject json);
     }
 
-    public interface JSONResponseComplete{
+    public interface JSONResponseComplete {
         void onComplete(JSONObject json, boolean netError);
     }
 
@@ -119,15 +120,17 @@ public class JSONResponse {
         new asyncNetwork(new asyncNetwork.OnAsyncNetworkCompleted() {
             @Override
             public void onAsyncTaskCompleted(String response, int responseCode) {
+                Log.i("ORM", "onAsyncTaskCompleted: " + response);
                 JSONObject jsonObject = new JSONObject();
                 try {
                     jsonObject = new JSONObject(response);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                Log.i("ORM", "onAsyncTaskCompleted: rc = " + responseCode);
                 newListener.onComplete(jsonObject, responseCode != 200);
             }
-        },this.context, this.url, this.params, this.files).execute();
+        }, this.context, this.url, this.params, this.files).execute();
     }
 
     public JSONObject getJsonObj(int i, String responseText) {

@@ -157,6 +157,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                                             String today = getRealFormat("yyyy-MM-dd").format(new Date());
                                             if (time != null && isTime(time) && !title.equals("") && !content.equals(" ")) {
                                                 long delta = calculateDelay(today + " " + (time.length() < 6 ? time + ":00" : time));
+                                                delta -= delta - 10 * 60 * 1000; // 10min before
                                                 String requestCode = today.replace("-", "") + i;
                                                 int resC = Integer.parseInt(requestCode.substring(2));
                                                 if (delta >= 0) {
@@ -211,6 +212,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                                             Log.i(TAG, "onComplete: isTime = " + isTime(time));
                                             if (time != null && isTime(time) && !title.equals("") && !content.equals(" ")) {
                                                 long delta = calculateDelay(today + " " + (time.length() < 6 ? time + ":00" : time));
+                                                delta -= delta - 10 * 60 * 1000; // 10min before
                                                 String requestCode = today.replace("-", "") + (i + 10);
                                                 int resC = Integer.parseInt(requestCode.substring(2));
                                                 if (delta >= 0) {
@@ -318,7 +320,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .setContentText(messageBody)
                         .setStyle(bigTextStyle)
                         .setAutoCancel(true)
-                        .setSound(defaultSoundUri)
+                        .setPriority(Notification.PRIORITY_HIGH)
+                        .setDefaults(Notification.DEFAULT_ALL)
+//                        .setSound(defaultSoundUri)
                         .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager =

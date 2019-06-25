@@ -105,6 +105,7 @@ public class asyncNetwork extends AsyncTask<String, Void, String> {
                     sb.append(newLine);
                 }
                 json = sb.toString();
+                Log.i("ORM", "doInBackground: json = " + json);
             } catch (Exception e) {
                 Log.e("Buffer Error", "Error converting result " + e.toString());
             }
@@ -156,51 +157,53 @@ public class asyncNetwork extends AsyncTask<String, Void, String> {
             conn.setDoInput(true);
             conn.setDoOutput(true);
             conn.setUseCaches(false);
+//            conn.setRequestProperty("User-Agent", "Mozilla/5.0 ( compatible ) ");
+//            conn.setRequestProperty("Accept", "*/*");
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Connection", "Keep-alive");
             conn.setRequestProperty("Charset", "UTF-8");
             conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + BOUNDARY);
-            if (params != null) {
-                StringBuffer sb = new StringBuffer();
-                for (Map.Entry<String, String> entry : params.entrySet()) {
-                    sb.append(PREFIX);
-                    sb.append(BOUNDARY);
-                    sb.append(LINE_END);
-                    sb.append("Content-Disposition:form-data;name=\"" + entry.getKey() + "\"" + LINE_END);
-                    sb.append("Content-Transfer-Encoding:8bit" + LINE_END);
-                    sb.append(LINE_END);
-                    sb.append(entry.getValue());
-                    sb.append(LINE_END);
-                }
-                DataOutputStream outputStream = new DataOutputStream(conn.getOutputStream());
-                outputStream.write(sb.toString().getBytes());
-                if (files != null) {
-                    for (Map.Entry<String, File> file : files.entrySet()) {
-                        StringBuffer sb1 = new StringBuffer();
-                        sb1.append(PREFIX);
-                        sb1.append(BOUNDARY);
-                        sb1.append(LINE_END);
-                        sb1.append("Content-Disposition:form-data;name=\"" + file.getKey() + "\";filename=\"" + file.getValue().getName() + "\"" + LINE_END);
-                        sb1.append("Content-Type:application/octet-stream;charset=UTF-8" + LINE_END);
-                        sb1.append(LINE_END);
-                        outputStream.write(sb1.toString().getBytes());
-                        InputStream is = new FileInputStream(file.getValue());
-                        byte[] buffer = new byte[1024];
-                        int len = 0;
-                        while ((len = is.read(buffer)) != -1) {
-                            outputStream.write(buffer, 0, len);
-                        }
-                        is.close();
-                        outputStream.write(LINE_END.getBytes());
-                    }
-                }
-                byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINE_END).getBytes();
-                outputStream.write(end_data);
-                outputStream.flush();
+//            if (params != null) {
+            StringBuffer sb = new StringBuffer();
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                sb.append(PREFIX);
+                sb.append(BOUNDARY);
+                sb.append(LINE_END);
+                sb.append("Content-Disposition:form-data;name=\"" + entry.getKey() + "\"" + LINE_END);
+                sb.append("Content-Transfer-Encoding:8bit" + LINE_END);
+                sb.append(LINE_END);
+                sb.append(entry.getValue());
+                sb.append(LINE_END);
             }
+            DataOutputStream outputStream = new DataOutputStream(conn.getOutputStream());
+            outputStream.write(sb.toString().getBytes());
+            if (files != null) {
+                for (Map.Entry<String, File> file : files.entrySet()) {
+                    StringBuffer sb1 = new StringBuffer();
+                    sb1.append(PREFIX);
+                    sb1.append(BOUNDARY);
+                    sb1.append(LINE_END);
+                    sb1.append("Content-Disposition:form-data;name=\"" + file.getKey() + "\";filename=\"" + file.getValue().getName() + "\"" + LINE_END);
+                    sb1.append("Content-Type:application/octet-stream;charset=UTF-8" + LINE_END);
+                    sb1.append(LINE_END);
+                    outputStream.write(sb1.toString().getBytes());
+                    InputStream is = new FileInputStream(file.getValue());
+                    byte[] buffer = new byte[1024];
+                    int len = 0;
+                    while ((len = is.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, len);
+                    }
+                    is.close();
+                    outputStream.write(LINE_END.getBytes());
+                }
+            }
+            byte[] end_data = (PREFIX + BOUNDARY + PREFIX + LINE_END).getBytes();
+            outputStream.write(end_data);
+            outputStream.flush();
+//            }
             responseCode = conn.getResponseCode();
             conn.disconnect();
-            return responseCode == 200 ? conn.getInputStream() : null;
+            return responseCode == 200 ? conn.getInputStream() : conn.getErrorStream();
         } catch (Exception e) {
             e.printStackTrace();
             return null;

@@ -57,9 +57,9 @@ public class AlarmReceiver extends BroadcastReceiver {
                 if (action.equals(API.ACTION_ALARM_ALERT)) {
                     sendNotification(context, bundle.getString("title"), bundle.getString("content"), bundle.getInt("notifyID"), null);
                 } else if (action.equals(API.ACTION_NUTRITION)) {
-                    sendAndSetNext(context, bundle, API.API_NUTRITION);
+                    sendAndSetNext(context, bundle, API.API_NUTRITION, "nutrition");
                 } else if (action.equals(API.ACTION_CLIENT_ALERT)) {
-                    sendAndSetNext(context, bundle, API.ACTION_CLIENT_ALERT);
+                    sendAndSetNext(context, bundle, API.ACTION_CLIENT_ALERT, "client_alert");
                 } else if (action.equals(API.ACTION_ALARM_TOAST)) {
                     String alert_title = intent.getStringExtra("title");
                     String alert_content = intent.getStringExtra("content");
@@ -78,14 +78,14 @@ public class AlarmReceiver extends BroadcastReceiver {
         }
     }
 
-    private void sendAndSetNext(Context context, Bundle bundle, String action) {
+    private void sendAndSetNext(Context context, Bundle bundle, String action, String type) {
         String title = bundle.getString("title", "");
         String content = bundle.getString("content", "");
         String time = bundle.getString("time", "");
         int index = bundle.getInt("index", -1);
         int notifyID = bundle.getInt("notifyID", -1);
         Log.i(TAG, "onReceive: index = " + index);
-        sendYesOrNoNotification(context, title, content, time, "nutrition", notifyID, index);
+        sendYesOrNoNotification(context, title, content, time, type, notifyID, index);
         if (!time.equals("")) {
             long delta = 24 * 60 * 60 * 1000;
             Log.i(TAG, "onReceive: deltaTime = " + delta);

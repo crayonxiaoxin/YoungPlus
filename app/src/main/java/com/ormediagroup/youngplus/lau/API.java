@@ -36,4 +36,8 @@ public class API {
     public static String ACTION_UPLOAD = "com.ormediagroup.youngplus.action.UPLOAD";
     public static String ACTION_NUTRITION = "com.ormediagroup.youngplus.action.nutrition";
     public static String ACTION_CLIENT_ALERT = "com.ormediagroup.youngplus.action.clientalert";
+
+    public static String API_CALORIE_MAMA = "http://api-2445582032290.production.gw.apicast.io/v1/foodrecognition?user_key=18b242c33a14220058c07f01537082cf";
+//    public static String API_CALORIE_MAMA = "http://api-2445582032290.production.gw.apicast.io/v1/foodrecognition";
+
 }

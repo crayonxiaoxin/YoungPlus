@@ -54,6 +54,14 @@ public class ReportFragment extends BaseFragment {
         return f;
     }
 
+    public static ReportFragment newInstance2(String type) {
+        ReportFragment f = new ReportFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("type", type);
+        f.setArguments(bundle);
+        return f;
+    }
+
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -92,13 +100,21 @@ public class ReportFragment extends BaseFragment {
         dialog = new ProcessingDialog(mActivity);
         Bundle bundle = getArguments();
         String link = "";
+        String type = "";
         if (bundle != null) {
             link = bundle.getString("url", "");
+            type = bundle.getString("type", "");
             Log.i(TAG, "initData: url = " + link);
         }
         if (link.equals("")) {
             if (userInfo.isUserLoggedIn()) {
-                new JSONResponse(mActivity, API.API_GET_REPORT, "uid=" + userInfo.getUserId(), new JSONResponse.onComplete() {
+                String params = "";
+                if (type.equals("disease_risk")) {
+                    params = "uid=" + userInfo.getUserId() + "&type=" + type;
+                } else {
+                    params = "uid=" + userInfo.getUserId();
+                }
+                new JSONResponse(mActivity, API.API_GET_REPORT, params, new JSONResponse.onComplete() {
                     @Override
                     public void onComplete(JSONObject json) {
                         try {

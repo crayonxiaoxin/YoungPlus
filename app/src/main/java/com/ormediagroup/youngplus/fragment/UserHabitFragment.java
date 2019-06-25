@@ -292,6 +292,7 @@ public class UserHabitFragment extends BaseFragment {
                 params.put("stool_remarks", textStoolRemarks.getValue());
                 final ProcessingDialog processingDialog = new ProcessingDialog(mActivity);
                 processingDialog.loading("正在提交...");
+                processingDialog.getLoading().setCancelable(false);
                 new JSONResponse(mActivity, API.API_NUTRITION, params, fileMap, new JSONResponse.JSONResponseComplete() {
                     @Override
                     public void onComplete(JSONObject json, boolean netError) {
@@ -304,6 +305,15 @@ public class UserHabitFragment extends BaseFragment {
                                 if (rc == 0) {
                                     processingDialog.loadingToSuccess("提交成功");
                                     deleteCacheFile();
+                                    processingDialog.getLoading().setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                        @Override
+                                        public void onDismiss(DialogInterface dialog) {
+                                            UserHabitFragmentListener uhfl = (UserHabitFragmentListener) mActivity;
+                                            if (uhfl != null) {
+                                                uhfl.toHome("home", 0);
+                                            }
+                                        }
+                                    });
                                 } else {
                                     processingDialog.loadingToFailed("提交失敗，請稍後重試");
                                 }
@@ -798,5 +808,9 @@ public class UserHabitFragment extends BaseFragment {
         super.onDestroy();
         deleteCacheFile();
         broadcastManager.unregisterReceiver(mMessageReceiver); // important,else oom
+    }
+
+    public interface UserHabitFragmentListener {
+        void toHome(String tag, int flag);
     }
 }
